@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h1>Categories</h1>
+
+<div>
+    <h2>Categories ({{ categories.count }})</h2>
+</div>
+{% for category in categories %}
+<!-- Category Image -->
+<div>
+    <img src="{{ category.image.url }}" alt="" height="128" width="128" />
+</div>
+<!-- Category Title -->
+<div>
+    <a href="#">{{ category.title }}</a>
+</div>
+<!-- Category Product Count -->
+<div>
+    <span>{{ category.category.count }} Product{{ category.category.count|pluralize }}</span>
+</div>
+<br>
+
+{% endfor %}
+
+{% endblock content %}
