@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if form.errors %}
+<div>
+    <strong>Error</strong>
+</div>
+{% endif %}
+
+<p> Already have an account?
+    <a href="{% url 'userauths:sign-in' %}">Sign in</a>
+</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    {{ form.username }}
+    {{ form.email }}
+    {{ form.password1 }}
+    {{ form.password2 }}
+
+    <button type="submit">Register</button>
+</form>
+
+{% endblock content %}
