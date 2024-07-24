@@ -1,0 +1,262 @@
+[
+    {
+        "model": "store.category",
+        "pk": 1,
+        "fields": {
+            "cid": "cat12345abc",
+            "title": "Electronics",
+            "image": "category/electronics.jpg"
+        }
+    },
+    {
+        "model": "store.category",
+        "pk": 2,
+        "fields": {
+            "cid": "cat23456bcd",
+            "title": "Books",
+            "image": "category/books.jpg"
+        }
+    },
+    {
+        "model": "store.category",
+        "pk": 3,
+        "fields": {
+            "cid": "cat34567cde",
+            "title": "Clothing",
+            "image": "category/clothing.jpg"
+        }
+    },
+    {
+        "model": "store.vendor",
+        "pk": 1,
+        "fields": {
+            "vid": "ven12345abc",
+            "title": "TechVendor",
+            "image": "vendor/techvendor.jpg",
+            "description": "Leading electronics supplier",
+            "address": "456 Tech Street",
+            "contact": "+123 (456) 789",
+            "chat_resp_time": "50",
+            "shipping_on_time": "95",
+            "authentic_rating": "90",
+            "days_return": "30",
+            "warranty_period": "12",
+            "user": 1
+        }
+    },
+    {
+        "model": "store.vendor",
+        "pk": 2,
+        "fields": {
+            "vid": "ven23456bcd",
+            "title": "BookStore",
+            "image": "vendor/bookstore.jpg",
+            "description": "Wide range of books and novels",
+            "address": "123 Book Street",
+            "contact": "+123 (555) 123",
+            "chat_resp_time": "30",
+            "shipping_on_time": "98",
+            "authentic_rating": "85",
+            "days_return": "15",
+            "warranty_period": "0",
+            "user": 2
+        }
+    },
+    {
+        "model": "store.vendor",
+        "pk": 3,
+        "fields": {
+            "vid": "ven34567cde",
+            "title": "FashionHub",
+            "image": "vendor/fashionhub.jpg",
+            "description": "Trendy and fashionable clothing",
+            "address": "789 Fashion Avenue",
+            "contact": "+123 (789) 456",
+            "chat_resp_time": "40",
+            "shipping_on_time": "90",
+            "authentic_rating": "88",
+            "days_return": "25",
+            "warranty_period": "6",
+            "user": 3
+        }
+    },
+    {
+        "model": "store.product",
+        "pk": 1,
+        "fields": {
+            "pid": "prd12345abc",
+            "title": "Smartphone",
+            "image": "product/smartphone.jpg",
+            "description": "Latest model with advanced features",
+            "user": 1,
+            "category": 1,
+            "price": "699.99",
+            "old_price": "799.99",
+            "specifications": "64GB, 6GB RAM, 12MP Camera",
+            "tags": null,
+            "product_status": "published",
+            "status": true,
+            "in_stock": true,
+            "featured": true,
+            "digital": false,
+            "sku": "sku1234",
+            "date": "2023-07-23T12:00:00Z",
+            "updated": "2023-07-23T12:00:00Z"
+        }
+    },
+    {
+        "model": "store.product",
+        "pk": 2,
+        "fields": {
+            "pid": "prd23456bcd",
+            "title": "Laptop",
+            "image": "product/laptop.jpg",
+            "description": "High-performance laptop for all needs",
+            "user": 1,
+            "category": 1,
+            "price": "1299.99",
+            "old_price": "1499.99",
+            "specifications": "256GB SSD, 8GB RAM, Intel i7",
+            "tags": null,
+            "product_status": "published",
+            "status": true,
+            "in_stock": true,
+            "featured": false,
+            "digital": false,
+            "sku": "sku2345",
+            "date": "2023-07-23T12:00:00Z",
+            "updated": "2023-07-23T12:00:00Z"
+        }
+    },
+    {
+        "model": "store.product",
+        "pk": 3,
+        "fields": {
+            "pid": "prd34567cde",
+            "title": "The Great Gatsby",
+            "image": "product/gatsby.jpg",
+            "description": "Classic novel by F. Scott Fitzgerald",
+            "user": 2,
+            "category": 2,
+            "price": "10.99",
+            "old_price": "14.99",
+            "specifications": "Paperback, 180 pages",
+            "tags": null,
+            "product_status": "published",
+            "status": true,
+            "in_stock": true,
+            "featured": false,
+            "digital": false,
+            "sku": "sku3456",
+            "date": "2023-07-23T12:00:00Z",
+            "updated": "2023-07-23T12:00:00Z"
+        }
+    },
+    {
+        "model": "store.product",
+        "pk": 4,
+        "fields": {
+            "pid": "prd45678def",
+            "title": "Summer Dress",
+            "image": "product/summerdress.jpg",
+            "description": "Light and comfortable summer dress",
+            "user": 3,
+            "category": 3,
+            "price": "49.99",
+            "old_price": "59.99",
+            "specifications": "Cotton, Medium size",
+            "tags": null,
+            "product_status": "published",
+            "status": true,
+            "in_stock": true,
+            "featured": true,
+            "digital": false,
+            "sku": "sku4567",
+            "date": "2023-07-23T12:00:00Z",
+            "updated": "2023-07-23T12:00:00Z"
+        }
+    },
+    {
+        "model": "store.productimages",
+        "pk": 1,
+        "fields": {
+            "images": "product_images/smartphone_1.jpg",
+            "product": 1,
+            "date": "2023-07-23T12:00:00Z"
+        }
+    },
+    {
+        "model": "store.productimages",
+        "pk": 2,
+        "fields": {
+            "images": "product_images/laptop_1.jpg",
+            "product": 2,
+            "date": "2023-07-23T12:00:00Z"
+        }
+    },
+    {
+        "model": "store.productimages",
+        "pk": 3,
+        "fields": {
+            "images": "product_images/gatsby_1.jpg",
+            "product": 3,
+            "date": "2023-07-23T12:00:00Z"
+        }
+    },
+    {
+        "model": "store.productimages",
+        "pk": 4,
+        "fields": {
+            "images": "product_images/summerdress_1.jpg",
+            "product": 4,
+            "date": "2023-07-23T12:00:00Z"
+        }
+    },
+    {
+        "model": "store.cartorder",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "price": "699.99",
+            "paid_status": true,
+            "order_date": "2023-07-23T12:00:00Z",
+            "product_status": "shipped"
+        }
+    },
+    {
+        "model": "store.cartorder",
+        "pk": 2,
+        "fields": {
+            "user": 2,
+            "price": "10.99",
+            "paid_status": true,
+            "order_date": "2023-07-23T12:00:00Z",
+            "product_status": "delivered"
+        }
+    },
+    {
+        "model": "store.cartorder",
+        "pk": 3,
+        "fields": {
+            "user": 3,
+            "price": "49.99",
+            "paid_status": true,
+            "order_date": "2023-07-23T12:00:00Z",
+            "product_status": "processing"
+        }
+    },
+    {
+        "model": "store.cartorderitems",
+        "pk": 1,
+        "fields": {
+            "order": 1,
+            "invoice_number": "INV12345",
+            "product_status": "shipped",
+            "item": "Smartphone",
+            "image": "product/smartphone.jpg",
+            "quantity": 1,
+            "price": "699.99",
+            "total": "699.99"
+        }
+    }
+]
