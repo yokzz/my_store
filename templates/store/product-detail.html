@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- Product Discount -->
+<div>
+    <span>-{{ product.get_percentage|floatformat:0 }}%</span>
+</div>
+<!-- Product Image -->
+<div>
+    <!-- Main Image -->
+    <div>
+        <img src="{{ product.image.url }}" alt="" height="128" width="128" />
+    </div>
+    <!-- Extra Images -->
+    {% if product_images %}
+    <h2>Other images</h2>
+    {% for product_images in product_images %}
+    <div>
+        <img src="{{ product.image.url }}" alt="" height="128" width="128" />
+    </div>
+    {% endfor %}
+
+    {% else %}
+
+    {% endif %}
+</div>
+<!-- Product Category -->
+<div>
+    <a href="{% url 'store:category-product-list' product.category.cid %}">{{ product.category.title }}</a>
+</div>
+<!-- Product Title -->
+<div>
+    <a href="{% url 'store:product-detail' product.pid %}">{{ product.title|truncatechars:50 }}</a>
+</div>
+<br>
+<!-- Product description short-->
+<div>
+    <p>{{ product.description|truncatechars:100 }}</p>
+</div>
+<!-- Product Vendor -->
+<div>
+    By <a href="{% url 'store:vendor-detail' product.vendor.vid %}">{{ product.vendor.title }}</a>
+</div>
+<!-- Product Price -->
+<div>   
+    <span>${{ product.price }}</span>
+    <br>
+    <span>${{ product.old_price }}</span>
+</div>
+<!-- Product Properties -->
+<div style="display: flex margin: 5px">
+    <small>Type: {{ product.type }}</small>
+    <small>SKU: {{ product.sku }}</small>
+    <small>MFD: {{ product.mfd|date:"d M, Y" }}</small>
+</div>
+<div style="display: flex margin: 5px">
+    <small>Life: {{ product.life }}</small>
+    <small>Stock: {{ product.stock_count }} Item{{ product.count|pluralize }} In Stock</small>
+</div>
+<!-- Product End-->
+<br>
+<!-- Info box 1 -->
+<div>
+    <!-- User Address-->
+    <div>
+        <span>📍{{ address.city }}, {{ address.address}}</span>
+        <br>
+        {% if address.status == True %}
+        <span>Verified ✅</span>
+        {% else %}
+        <span>Unverified ❌</span>
+        {% endif %}
+    </div>
+    <hr>
+    <!-- Product Info-->
+    <div>
+        <h5>Return & Warranty</h5>
+        <!-- Product Authentic Rating -->
+        <span> {{ product.vendor.authentic_rating }}% Authentic</span>
+        <br>
+        <!-- Product Return -->
+        <span> {{ product.vendor.days_return }} Days Return </span>
+        <br>
+        <!-- Product Warranty -->
+        <span> {{ product.vendor.warranty_period }} Months Warranty </span>
+        <br>
+    </div>
+</div>
+<br>
+<!-- Info box 2 -->
+<div>
+    <h3>Vendor</h3>
+
+    <!-- Vendor Title -->
+    <a href="{% url 'store:vendor-detail' product.vendor.vid %}"><h1>{{ product.vendor.title }}</h1><a>
+    <!-- Vendor Image -->
+    <div>
+        <img src="{{ product.vendor.image.url }}" alt="" height="256" width="256" />
+    </div>
+    <br>
+    <!-- Vendor Address-->
+    <div>
+        <span>📍Address: {{ product.vendor.city }}, {{ product.vendor.address}}</span>
+        <br>
+    </div>
+    <!-- Vendor Address-->
+    <div>
+        <span>🎧 Contact Seller: {{ product.vendor.contact }}</span>
+    </div>
+    <hr>
+    <!-- Vendor Rating -->
+    <div>
+        <p>Rating</p>
+        <h4>92%</h4>
+    </div>
+    <!-- Vendor Shipping on Time -->
+    <div>
+        <p>Ship on time</p>
+        <h4>{{ product.vendor.shipping_on_time }}%</h4>
+    </div>
+    <!-- Vendor Chat Response -->
+    <div>
+        <p>Chat Response</p>
+        <h4>{{ product.vendor.chat_resp_time }}%</h4>
+    </div>
+</div>
+<!-- Info down -->
+<!-- Product description full -->
+<div>
+    <h3>Description</h3>
+    <p>{{ product.description|safe }}</p>
+</div>
+<br>
+<!-- Related Products -->
+{% for product in products %}
+
+<!-- Product Discount -->
+<div>
+    <span>-{{ product.get_percentage|floatformat:0 }}%</span>
+</div>
+<!-- Product Image -->
+<div>
+    <img src="{{ product.image.url }}" alt="" height="128" width="128" />
+</div>
+<!-- Product Title -->
+<div>
+    <a href="{% url 'store:product-detail' product.pid%}">{{ product.title|truncatechars:50 }}</a>
+</div>
+<!-- Product Price -->
+<div>   
+    <span>${{ product.price }}</span>
+    <br>
+    <span>${{ product.old_price }}</span>
+</div>
+<br>
+<!-- Product End-->
+
+
+{% endfor %}
+
+<!-- Category Filter -->
+<h1>Category</h1>
+
+{% for category in categories %}
+
+<!-- Category Image -->
+<div>
+    <img src="{{ category.image.url }}" alt="" height="128" width="128" />
+</div>
+<!-- Category Title -->
+<div>
+    <a href="{% url 'store:category-product-list' category.cid %}">{{ category.title }}</a>
+</div>
+<!-- Category Product Count -->
+<div>
+    <span>{{ category.category.count }} Product{{ category.category.count|pluralize }}</span>
+</div>
+<br>
+
+{% endfor %}
+
+{% endblock content %}

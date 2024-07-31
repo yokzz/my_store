@@ -16,15 +16,15 @@
 </div>
 <!-- Product Category -->
 <div>
-    <a href="#">{{ product.category.title }}</a>
+    <a href="{% url 'store:category-product-list' product.category.cid %}">{{ product.category.title }}</a>
 </div>
 <!-- Product Title -->
 <div>
-    <p>{{ product.title }}</p>
+    <a href="{% url 'store:product-detail' product.pid%}">{{ product.title|truncatechars:50 }}</a>
 </div>
 <!-- Product Vendor -->
 <div>
-    <li>By {{ product.vendor.title }}</li>
+    By <a href="{% url 'store:vendor-detail' product.vendor.vid %}">{{ product.vendor.title }}</a>
 </div>
 <!-- Product Price -->
 <div>   

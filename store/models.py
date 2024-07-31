@@ -2,7 +2,7 @@ from django.db import models
 from shortuuid.django_fields import ShortUUIDField
 from django.utils.safestring import mark_safe
 from userauths.models import User
-
+from ckeditor_uploader.fields import RichTextUploadingField
 
 STATUS_CHOICE = (
     ("process", "Processing"),
@@ -55,11 +55,14 @@ class Tags(models.Model):
 class Vendor(models.Model):
     vid = ShortUUIDField(unique=True, length=10, max_length=30, prefix="ven", alphabet="abcdefgh12345")
     
-    title = models.CharField(max_length=63, default="Nestify")
+    title = models.CharField(max_length=63, default="Madarima")
     image = models.ImageField(upload_to=user_directory_path, default="vendor.jpg")
-    description = models.TextField(null=True, blank=True, default="I am a Cool Vendor")
+    cover_image = models.ImageField(upload_to=user_directory_path, default="cover_vendor.jpg")
+    description = RichTextUploadingField(null=True, blank=True, default="I am a Cool Vendor")
     
-    address = models.CharField(max_length=63, default="123 Main Street.")
+    address = models.CharField(max_length=127, null=True)
+    city = models.CharField(max_length=63, blank=True, null=True)
+    post_code = models.IntegerField(blank=True, null=True)
     contact = models.CharField(max_length=63, default="+123 (456) 789")
     chat_resp_time = models.CharField(max_length=63, default="100")
     shipping_on_time = models.CharField(max_length=63, default="100")
@@ -69,6 +72,8 @@ class Vendor(models.Model):
     
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
+    date_of_join = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    
     class Meta:
         verbose_name_plural = "Vendors"
     
@@ -85,16 +90,21 @@ class Product(models.Model):
     
     title = models.CharField(max_length=63, default ="Volleyball")
     image = models.ImageField(upload_to=user_directory_path, default="product.jpg")
-    description = models.TextField(null=True, blank=True, default="This is the product")
+    description = RichTextUploadingField(null=True, blank=True, default="This is the product")
     
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name="category")
-    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True)
+    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True, related_name="products")
     
     price = models.DecimalField(max_digits=999999999, decimal_places=2, default="1.99")
     old_price = models.DecimalField(max_digits=999999999, decimal_places=2, default="2.99")
     
-    specifications = models.TextField(null=True, blank=True)
+    specifications = RichTextUploadingField(null=True, blank=True)
+    type = models.CharField(max_length=63, default ="Organic", null=True, blank=True)
+    stock_count = models.CharField(max_length=63, default="12", null=True, blank=True)
+    life = models.CharField(max_length=63, default="365 Days", null=True, blank=True)
+    mfd = models.DateTimeField(auto_now_add=False, null=True, blank=True)
+    
     # tags = models.ForeignKey(Tags, on_delete=models.SET_NULL, null=True)
     
     product_status = models.CharField(choices=STATUS, max_length=10, default="in_review")
@@ -127,7 +137,7 @@ class Product(models.Model):
 
 class ProductImages(models.Model):
     images = models.ImageField(upload_to="product_images", default="product.jpg")
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, related_name="product_images")
     date = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -176,7 +186,7 @@ class CartOrderItems(models.Model):
 class ProductReview(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
-    review = models.TextField()
+    review = RichTextUploadingField()
     rating = models.IntegerField(choices=RATING, default=None)
     date = models.DateTimeField(auto_now_add=True)
     
@@ -207,6 +217,8 @@ class Wishlist(models.Model):
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     address = models.CharField(max_length=127, null=True)
+    city = models.CharField(max_length=63, blank=True, null=True)
+    post_code = models.IntegerField(blank=True, null=True)
     status = models.BooleanField(default=False)
     
     class Meta:

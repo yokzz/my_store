@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- Vendor Title -->
+<h1>{{ vendor.title }}</h1>
+<!-- Vendor Image -->
+<div>
+    <img src="{{ vendor.image.url }}" alt="" height="256" width="256" />
+</div>
+<!-- Vendor Date of Join -->
+<div>
+    <p>Since | {{ vendor.date_of_join|date:"d M, Y"}}</p>
+</div>
+<!-- Vendor Description -->
+<div>
+    <p>{{ vendor.description }}</p>
+</div>
+<!-- Vendor Address & Contact -->
+<div>
+    <strong>Address: </strong><span>{{ vendor.address }}</span>
+    <strong>Contact: </strong><span>{{ vendor.contact }}</span>
+</div>
+
+<!-- Vendor Items -->
+<h2>Vendor Items</h2>
+<small>We found <strong>{{ products.count }}</strong> product{{ products.count|pluralize }} from <strong>{{ vendor.title }}</strong></small>
+<br>
+<br>
+
+{% for product in products %}
+<!-- Product Discount -->
+<div>
+    <span>-{{ product.get_percentage|floatformat:0 }}%</span>
+</div>
+<!-- Product Image -->
+<div>
+    <img src="{{ product.image.url }}" alt="" height="128" width="128" />
+</div>
+<!-- Product Category -->
+<div>
+    <a href="{% url 'store:category-product-list' product.category.cid %}">{{ product.category.title }}</a>
+</div>
+<!-- Product Title -->
+<div>
+    <a href="{% url 'store:product-detail' product.pid%}">{{ product.title|truncatechars:50 }}</a>
+</div>
+<!-- Product Price -->
+<div>   
+    <span>${{ product.price }}</span>
+    <br>
+    <span>${{ product.old_price }}</span>
+</div>
+<br>
+<!-- Product End-->
+
+{% endfor %}
+
+<!-- Category Filter -->
+<h1>Category</h1>
+
+{% for category in categories %}
+
+<!-- Category Image -->
+<div>
+    <img src="{{ category.image.url }}" alt="" height="128" width="128" />
+</div>
+<!-- Category Title -->
+<div>
+    <a href="{% url 'store:category-product-list' category.cid %}">{{ category.title }}</a>
+</div>
+<!-- Category Product Count -->
+<div>
+    <span>{{ category.category.count }} Product{{ category.category.count|pluralize }}</span>
+</div>
+<br>
+
+{% endfor %}
+
+{% endblock content %}

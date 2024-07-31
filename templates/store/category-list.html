@@ -15,7 +15,7 @@
 </div>
 <!-- Category Title -->
 <div>
-    <a href="#">{{ category.title }}</a>
+    <a href="{% url 'store:category-product-list' category.cid %}">{{ category.title }}</a>
 </div>
 <!-- Category Product Count -->
 <div>

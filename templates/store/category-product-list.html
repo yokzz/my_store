@@ -2,6 +2,13 @@
 {% load static %}
 
 {% block content %}
+<!-- Category Title -->
+<div>
+    <h1>{{ category.title }}</h1>
+</div>
+<div>
+    <p>We found {{ products.count }} item{{ products.count|pluralize }} for you!
+<div>
 
 {% for product in products %}
 <!-- Product Discount -->
@@ -14,7 +21,7 @@
 </div>
 <!-- Product Category -->
 <div>
-    <a href="{% url 'store:category-product-list' product.category.cid %}">{{ product.category.title }}</a>
+    <a href="{% url 'store:category-product-list' category.cid %}">{{ product.category.title }}</a>
 </div>
 <!-- Product Title -->
 <div>

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h1>Vendors List</h1>
+
+<!-- Vendor Count -->
+<small>We have {{ vendors.count }} vendor{{ vendors.count|pluralize }}</small>
+
+{% for vendor in vendors %}
+
+<!-- Vendor Image -->
+<div>
+    <img src="{{ vendor.image.url }}" alt="" height="128" width="128" />
+</div>
+<!-- Vendor Title -->
+<div>
+    <a href="{% url 'store:vendor-detail' vendor.vid %}">{{ vendor.title }}</a>
+</div>
+<!-- Vendor Title -->
+<div>
+    <li>{{ vendor.products.all.count}} Products</li>
+</div>
+<!-- Vendor Description -->
+<div>
+    <p>{{ vendor.description }}</p>
+</div>
+<!-- Vendor Date of Join -->
+<div>
+    <p>Since | {{ vendor.date_of_join|date:"d/m, Y"}}</p>
+</div>
+<!-- Vendor Address & Contact -->
+<div>
+    <strong>Address: </strong><span>{{ vendor.address }}</span>
+    <strong>Contact: </strong><span>{{ vendor.contact }}</span>
+</div>
+
+{% endfor %}
+
+{% endblock content%}
