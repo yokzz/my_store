@@ -1,18 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="signin-container">
+    <h1 class="signin-title">Sign In</h1>
+    <p class="signup-prompt">Don't have an account? <a href="{% url 'userauths:sign-up' %}" class="signup-link">Create one here</a></p>
 
-<p> Dont have an account?
-    <a href="{% url 'userauths:sign-up' %}">Create here</a>
-</p>
+    <form method="post" class="signin-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="email">Email or Username</label>
+            <input type="text" id="email" name="email" required placeholder="Username or Email" class="form-input">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required placeholder="Your password" class="form-input">
+        </div>
 
-<form method="post">
-    {% csrf_token %}
-
-    <input type="text" required name="email" placeholder="Username or Email">
-    <input type="password" required name="password" placeholder="Your password">
-
-    <button type="submit">Login</button>
-</form>
-
+        <button type="submit" class="signin-button">Login</button>
+    </form>
+</div>
 {% endblock content %}

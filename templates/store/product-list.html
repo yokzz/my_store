@@ -1,38 +1,42 @@
-{% extends "base.html" %}
-{% load static %}
-
+{% extends 'base.html' %}
 {% block content %}
 
-{% for product in products %}
-<!-- Product Discount -->
-<div>
-    <span>-{{ product.get_percentage|floatformat:0 }}%</span>
+<div class="product-container">
+    <div class="product-list">
+        {% for product in products %}
+        <!-- Product Item -->
+        <div class="product-item">
+            <!-- Product Discount -->
+            <div class="product-discount">
+                <span class="discount-badge">-{{ product.get_percentage|floatformat:0 }}%</span>
+            </div>
+            <!-- Product Image -->
+            <div class="product-image">
+                <img src="{{ product.image.url }}" alt="{{ product.title }}" height="128" width="128" />
+            </div>
+            <!-- Product Details -->
+            <div class="product-details">
+                <!-- Product Category -->
+                <div class="product-category">
+                    <a href="{% url 'store:category-product-list' product.category.cid %}">{{ product.category.title }}</a>
+                </div>
+                <!-- Product Title -->
+                <div class="product-title">
+                    <a href="{% url 'store:product-detail' product.pid %}">{{ product.title|truncatechars:50 }}</a>
+                </div>
+                <!-- Product Vendor -->
+                <div class="product-vendor">
+                    By <a href="{% url 'store:vendor-detail' product.vendor.vid %}">{{ product.vendor.title }}</a>
+                </div>
+                <!-- Product Price -->
+                <div class="product-price">
+                    <span class="current-price">${{ product.price }}</span>
+                    <span class="old-price">${{ product.old_price }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
-<!-- Product Image -->
-<div>
-    <img src="{{ product.image.url }}" alt="" height="128" width="128" />
-</div>
-<!-- Product Category -->
-<div>
-    <a href="{% url 'store:category-product-list' product.category.cid %}">{{ product.category.title }}</a>
-</div>
-<!-- Product Title -->
-<div>
-    <a href="{% url 'store:product-detail' product.pid%}">{{ product.title|truncatechars:50 }}</a>
-</div>
-<!-- Product Vendor -->
-<div>
-    By <a href="{% url 'store:vendor-detail' product.vendor.vid %}">{{ product.vendor.title }}</a>
-</div>
-<!-- Product Price -->
-<div>   
-    <span>${{ product.price }}</span>
-    <br>
-    <span>${{ product.old_price }}</span>
-</div>
-<br>
-<!-- Product End-->
-
-{% endfor %}
 
 {% endblock content %}
