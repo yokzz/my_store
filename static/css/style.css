@@ -905,3 +905,259 @@ body {
 .signup-button:hover {
     background-color: #0056b3;
 }
+
+.review-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.review-title {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    color: #333;
+    text-align: center;
+}
+
+.messages {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group input, 
+.form-group textarea, 
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.submit-btn {
+    display: inline-block;
+    width: 100%;
+    padding: 10px 0;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1em;
+    cursor: pointer;
+    text-align: center;
+}
+
+.submit-btn:hover {
+    background-color: #45a049;
+}
+
+@media (max-width: 600px) {
+    .review-container {
+        padding: 15px;
+    }
+
+    .review-title {
+        font-size: 1.25em;
+    }
+
+    .submit-btn {
+        padding: 12px 0;
+    }
+}
+
+/* Container for a single review */
+.single-review {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+}
+
+/* Review header (user logo and username) */
+.review-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* User avatar styling */
+.review-avatar {
+    border-radius: 50%;
+    margin-right: 15px;
+    border: 2px solid #ddd;
+    height: 48px;
+    width: 48px;
+    object-fit: cover;
+}
+
+/* Username and date container */
+.review-user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Username styling */
+.review-username {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #333;
+    text-decoration: none;
+}
+
+.review-username:hover {
+    text-decoration: underline;
+}
+
+/* Review date styling */
+.review-date {
+    font-size: 0.9em;
+    color: #999;
+}
+
+/* Review content styling */
+.review-content {
+    margin-bottom: 10px;
+    font-size: 1em;
+    line-height: 1.6;
+    color: #555;
+}
+
+/* Review rating styling */
+.review-rating {
+    font-size: 1.2em;
+    color: #ffcc00;
+    text-align: right;
+}
+
+/* Styles for multiple reviews on the same page */
+.single-review {
+    margin-bottom: 15px;
+}
+
+/* Adjustments for larger screens */
+@media (min-width: 768px) {
+    .single-review {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .review-content {
+        flex-grow: 1;
+        margin-bottom: 0;
+        padding-left: 15px;
+    }
+
+    .review-rating {
+        margin-left: auto;
+        text-align: right;
+    }
+}
+
+.review-statistics {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fefefe;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Title Styling */
+.review-statistics h1 {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+/* Average Rating Styling */
+.average-rating {
+    font-size: 1.5em;
+    color: #ffcc00;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.rating-value {
+    font-size: 2.5em;
+    color: #ff9900;
+}
+
+/* Star Progress Container */
+.star-progress-container {
+    margin-top: 20px;
+}
+
+/* Individual Star Progress */
+.star-progress {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.star-label {
+    width: 80px;
+    text-align: left;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Progress Bar Styling */
+.progress-bar {
+    flex-grow: 1;
+    height: 12px;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-left: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #4CAF50;
+    border-radius: 6px;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .review-statistics {
+        padding: 15px;
+    }
+
+    .review-statistics h1 {
+        font-size: 1.8em;
+    }
+
+    .average-rating {
+        font-size: 1.3em;
+    }
+
+    .rating-value {
+        font-size: 2.2em;
+    }
+
+    .star-label {
+        width: 60px;
+        font-size: 0.9em;
+    }
+
+    .progress-bar {
+        height: 10px;
+    }
+}

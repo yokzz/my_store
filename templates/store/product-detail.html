@@ -8,7 +8,7 @@
 
     <!-- Product Discount -->
     <div class="product-discount">
-        <span>-{{ product.get_percentage|floatformat:0 }}%</span>
+        <span class="discount-badge">-{{ product.get_percentage|floatformat:0 }}%</span>
     </div>
 
     <!-- Product Image Gallery -->
@@ -138,67 +138,98 @@
     <br>
 
     <!-- Reviews -->
-    <div>
+    <div class="reviews">
         {% for review in reviews %}
         <!-- Single Review -->
-        <div>
+        <div class="single-review">
             <!-- Review User Logo & Username -->
-            <div>
-                <img src="{% static 'img/admin-logo.jpg' %}" alt="" height="64" width="64" />
-                <a href="#">{{ review.user.username }}</a>
+            <div class="review-header">
+                <img src="{% static 'img/admin-logo.jpg' %}" alt="User Avatar" class="review-avatar" id="review-avatar" />
+                <a href="#" class="review-username">{{ review.user.username }}</a>
             </div>
             <!-- Review Content -->
-            <div>
+            <div class="review-content">
                 <p>{{ review.review|safe }}</p>
             </div>
             <!-- Review Date -->
-            <div>
+            <div class="review-date">
                 <span>{{ review.date|date:"d M, Y" }}</span>
             </div>
+            <!-- Review Rating -->
+            <div class="review-rating">
+                {% for star in review.rating|ljust:review.rating %}
+                    <span>★</span>
+                {% endfor %}
+            </div>
+        </div>
         {% endfor %}
+    </div>
 
         <!-- Review Statistics -->
-        <div>
+        <div class="review-statistics">
             <h1>Customer reviews</h1>
-            {{ average_rating.rating|floatformat:1 }} out of 5.0
-            <!-- 5 star progress -->
-            <div>
-                <span></span>
+            <div class="average-rating">
+                <span class="rating-value">{{ average_rating.rating|floatformat:1 }}</span> out of 5.0
             </div>
-            <!-- 4 star progress -->
-            <div>
-                <span></span>
-            </div>
-            <!-- 3 star progress -->
-            <div>
-                <span></span>
-            </div>
-            <!-- 2 star progress -->
-            <div>
-                <span></span>
-            </div>
-            <!-- 1 star progress -->
-            <div>
-                <span></span>
+            <div class="star-progress-container">
+                <!-- 5 star progress -->
+                <div class="star-progress">
+                    <span class="star-label">5 stars</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%;"></div>
+                    </div>
+                </div>
+                <!-- 4 star progress -->
+                <div class="star-progress">
+                    <span class="star-label">4 stars</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%;"></div>
+                    </div>
+                </div>
+                <!-- 3 star progress -->
+                <div class="star-progress">
+                    <span class="star-label">3 stars</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%;"></div>
+                    </div>
+                </div>
+                <!-- 2 star progress -->
+                <div class="star-progress">
+                    <span class="star-label">2 stars</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%;"></div>
+                    </div>
+                </div>
+                <!-- 1 star progress -->
+                <div class="star-progress">
+                    <span class="star-label">1 star</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 10%;"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- Review form -->
-         <div>
-            <h3>Add a review</h3>
-            <strong id="review-response">Review added</strong>
-            <form method="post" action="{% url 'store:ajax-add-review' product.pid %}" id="reviewForm">
-
+        {% if request.user.is_authenticated %}
+        {% if make_review == True %}
+        <div class="review-container">
+            <h3 class="review-title hide-review">Add a review</h3>
+            <div class="messages">
+                <strong id="review-response"></strong>
+            </div>
+            <form method="post" action="{% url 'store:ajax-add-review' product.pid %}" class="review-form hide-review-form" id="reviewForm">
                 {% csrf_token %}
-                <div>
+                <div class="form-group">
                     {{ review_form.review }}
                 </div>
-                <div>
+                <div class="form-group">
                     {{ review_form.rating }}
                 </div>
-
-                <button type="submit">Submit Review</button>
+                <button type="submit" class="submit-btn">Submit Review</button>
             </form>
-         </div>
+        </div>
+        {% endif %}
+        {% endif %}
     </div>
 
     <br>
