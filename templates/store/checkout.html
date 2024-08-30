@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Checkout</h1>
+<h3>Billing details</h3>
+<section class="cart-summary">
+    <div class="cart-items">
+        <div>
+            <h4>Your order</h4>
+            <h4>Subtotal: ${{ cart_total_amount|floatformat:2 }}</h4>
+        </div>
+        {% for product_id, product in cart_data.items %}
+        <div class="cart-item">
+            <!-- Product Image -->
+            <div class="cart-item-image">
+                <img src="{{ product.image }}" alt="{{ product.title }}" />
+            </div>
+            <!-- Product Details -->
+            <div class="cart-item-details">
+                <a href="{% url 'store:product-detail' product.pid %}" class="cart-item-title">{{ product.title|truncatechars:50 }}</a>
+                <p class="cart-item-price">${{ product.price|floatformat:2 }}</p>
+                <input type="number" value="{{ product.quantity }}" min="1" id="product-quantity-{{ product_id }}" class="cart-item-quantity" readonly />
+                <p class="cart-item-subtotal">${% widthratio product.price 1 product.quantity %}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+<div>
+    {{ form.render }}
+</div>
+<a href="{% url 'store:cart' %}" class="signin-button">Go back to cart</a>
+
+
+{% endblock %}

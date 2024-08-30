@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="invoice-box">
+    <table cellpadding="0" cellspacing="0">
+        <tr class="top">
+            <td colspan="2">
+                <table>
+                    <tr>
+                        <td class="title">
+                            {% comment %} <img
+                                src="https://sparksuite.github.io/simple-html-invoice-template/images/logo.png"
+                                style="width: 100%; max-width: 300px"
+                            /> {% endcomment %}
+                        </td>
+
+                        <td>
+                            Invoice #: <br />
+                            Created: January 1, 2023<br />
+                            Due: February 1, 2023
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr class="information">
+            <td colspan="2">
+                <table>
+                    <tr>
+                        <td>
+                            Sparksuite, Inc.<br />
+                            12345 Sunny Road<br />
+                            Sunnyville, CA 12345
+                        </td>
+
+                        <td>
+                            Acme Corp.<br />
+                            {{ request.user.username }}<br />
+                            {{ request.settings.PAYPAL_RECEIVER_EMAIL }}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr class="heading">
+            <td>Payment Method</td>
+
+            <td>Check #</td>
+        </tr>
+
+        <tr class="details">
+            <td>Check</td>
+
+            <td>1000</td>
+        </tr>
+
+        <tr class="heading">
+            <td>Item</td>
+
+            <td>Quantity</td>
+
+            <td>Price</td>
+        </tr>
+
+        {% for product_id, product in cart_data.items %}
+            <tr class="item">
+                <td>{{ product.title }}</td>
+                
+                <td>{{ product.quantity }}</td>
+
+                <td>${% widthratio product.price 1 product.quantity %}</td>
+            </tr>
+        {% endfor %}
+
+        <tr class="total">
+            <td></td>
+
+            <td>Subtotal: ${{ cart_total_amount }}</td>
+        </tr>
+    </table>
+</div>
+
+{% endblock content %}

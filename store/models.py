@@ -5,7 +5,7 @@ from userauths.models import User
 from ckeditor_uploader.fields import RichTextUploadingField
 
 STATUS_CHOICE = (
-    ("process", "Processing"),
+    ("processing", "Processing"),
     ("shipped", "Shipped"),
     ("delivered", "Delivered"),
 )
@@ -132,7 +132,7 @@ class Product(models.Model):
     
     def get_percentage(self):
         new_price = ((self.old_price - self.price) / self.old_price) * 100
-        return new_price 
+        return new_price
     
 
 class ProductImages(models.Model):

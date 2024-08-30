@@ -5,7 +5,11 @@
 
 <!-- Category Title -->
 <div class="category-section">
-    <h1 class="category-title">{{ category.title }}</h1>
+    {% if query %}
+    <h1 class="category-title">{{ query }}</h1>
+    {% else %}
+    <h1 class="category-title">You didn't search anything</h1>
+    {% endif %}
     <p class="product-count">We found {{ products.count }} item{{ products.count|pluralize }} for you!</p>
 </div>
 

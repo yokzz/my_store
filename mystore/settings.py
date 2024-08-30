@@ -41,11 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'store',
+    'payment',
+    'customer',
     
     # Third party
     'ckeditor',
-    
-    'store',
+    'paypal.standard.ipn',
 ]
 
 MIDDLEWARE = [
@@ -152,4 +154,10 @@ JAZZMIN_SETTINGS = {
 
 AUTH_USER_MODEL = 'userauths.User'
 
+LOGIN_URL = 'userauths:sign-in'
+
 CKEDITOR_UPLOAD_PATH = 'uploads/'
+
+PAYPAL_TEST = True
+
+PAYPAL_RECEIVER_EMAIL = "yokzzbusiness@paypal.com"

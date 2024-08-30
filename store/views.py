@@ -1,9 +1,16 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Count, Avg
+from django.template.loader import render_to_string
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 from store.models import Product, Category, Vendor, CartOrder, CartOrderItems, Wishlist, Tags, ProductImages, ProductReview, Address 
 from store.forms import ProductReviewForm
+
+from paypal.standard.forms import PayPalPaymentsForm
 
 
 def index(request):
@@ -18,8 +25,9 @@ def index(request):
 def product_list_view(request):
     products = Product.objects.filter(product_status="published")
     
+    
     context = {
-        "products": products
+        "products": products,
     }
     
     return render(request, "store/product-list.html", context)   
@@ -27,7 +35,7 @@ def product_list_view(request):
 def product_detail_view(request, pid):
     product = Product.objects.get(pid=pid)
     products = Product.objects.filter(category=product.category).exclude(pid=pid)[:4]
-    product_images = product.product_images.all()
+    product_images = product.product_image.all()
 
     # Getting all reviews related to product
     reviews = ProductReview.objects.filter(product=product).order_by("-date")
@@ -125,3 +133,155 @@ def ajax_add_review(request, pid):
             'avg_reviews': average_reviews,
         }
     )
+    
+def search_view(request):
+    query = request.GET["query"]
+    
+    products = Product.objects.filter(title__icontains=query).order_by("-date")
+    
+    context = {
+        "products": products,
+        "query": query,
+    }
+    
+    return render(request, "store/search.html", context)
+
+def product_filter_view(request):
+    categories = request.GET.getlist('category[]')
+    
+    min_price = request.GET['min_price']
+    max_price = request.GET['max_price']
+    
+    products = Product.objects.filter(product_status="published").order_by("id").distinct()
+    
+    products = products.filter(price__gte=min_price)
+    products = products.filter(price__lte=max_price)
+    
+    if len(categories) > 0:
+        products = products.filter(category__cid__in=categories).distinct() 
+        
+    data = render_to_string("store/async/product-list.html", {"products": products})
+    
+    return JsonResponse({"data": data}) 
+
+@login_required
+def add_to_cart(request):
+    cart_products = {}
+    
+    cart_products[str(request.GET['id'])] = {
+        'title': request.GET['title'], 
+        'quantity': request.GET['quantity'],
+        'price': request.GET['price'],
+        'image': request.GET['image'],
+        'pid': request.GET['pid'],
+    }
+    
+    if 'cart_data_obj' in request.session:
+        if str(request.GET['id']) in request.session['cart_data_obj']:
+            cart_data = request.session['cart_data_obj']
+            cart_data[str(request.GET['id'])]['quantity'] = int(cart_products[str(request.GET['id'])]['quantity'])
+            cart_data.update(cart_data)
+            request.session['cart_data_obj'] = cart_data
+        else:
+            cart_data = request.session['cart_data_obj']
+            cart_data.update(cart_products)
+            request.session['cart_data_obj'] = cart_data
+            
+    else:
+        request.session['cart_data_obj'] = cart_products
+        
+    return JsonResponse({"data": request.session['cart_data_obj'], 'total_cart_items': len(request.session['cart_data_obj'])})
+
+def cart_view(request):
+    cart_total_amount = 0
+    if 'cart_data_obj' in request.session:
+        for product_id, product in request.session['cart_data_obj'].items():
+            cart_total_amount += int(product['quantity']) * float(product['price'])           
+        
+        return render(request, "store/cart.html", {"cart_data": request.session['cart_data_obj'], 'total_cart_items': len(request.session['cart_data_obj']), 'cart_total_amount':cart_total_amount})
+    else:
+        return redirect("store:index")
+    
+def delete_from_cart(request):
+    product_id = str(request.GET['id'])
+    if 'cart_data_obj' in request.session:
+        if product_id in request.session['cart_data_obj']:
+            cart_data = request.session['cart_data_obj']
+            del request.session['cart_data_obj'][product_id]
+            request.session['cart_data_obj'] = cart_data
+            
+    cart_total_amount = 0
+    if 'cart_data_obj' in request.session:
+        for product_id, product in request.session['cart_data_obj'].items():
+            cart_total_amount += int(product['quantity']) * float(product['price'])
+            
+    
+    data = render_to_string("store/async/cart-page.html", {"cart_data": request.session['cart_data_obj'], 'total_cart_items': len(request.session['cart_data_obj']), 'cart_total_amount':cart_total_amount})
+    return JsonResponse({"data": data, 'total_cart_items': len(request.session['cart_data_obj'])})
+
+def update_cart(request):
+    product_id = str(request.GET['id'])
+    quantity = request.GET['quantity']
+    
+    if 'cart_data_obj' in request.session:
+        if product_id in request.session['cart_data_obj']:
+            cart_data = request.session['cart_data_obj']
+            cart_data[str(request.GET['id'])]['quantity'] = quantity
+            request.session['cart_data_obj'] = cart_data
+            
+    cart_total_amount = 0
+    if 'cart_data_obj' in request.session:
+        for product_id, product in request.session['cart_data_obj'].items():
+            cart_total_amount += int(product['quantity']) * float(product['price'])
+            
+    
+    data = render_to_string("store/async/cart-page.html", {"cart_data": request.session['cart_data_obj'], 'total_cart_items': len(request.session['cart_data_obj']), 'cart_total_amount':cart_total_amount})
+    return JsonResponse({"data": data, 'total_cart_items': len(request.session['cart_data_obj'])})
+
+@login_required
+def checkout_view(request):
+    cart_total_amount = 0
+    total_amount = 0
+    
+    # Checking if cart_data_obj session still exists
+    if 'cart_data_obj' in request.session: 
+        # Getting total amount for paypal amount
+        for product_id, product in request.session['cart_data_obj'].items():
+            total_amount += int(product['quantity']) * float(product['price'])
+
+        # Creating order object
+        order = CartOrder.objects.create(
+            user=request.user,
+            price = total_amount,
+        )
+        
+        # Getting total amount for the cart
+        for product_id, product in request.session['cart_data_obj'].items():
+            cart_total_amount += int(product['quantity']) * float(product['price']) 
+
+            cart_order_products = CartOrderItems.objects.create(
+                order=order,
+                invoice_number="INVOICE_NO-" + str(order.id),
+                item=product['title'],
+                image=product['image'],
+                quantity=product['quantity'],
+                price=product['price'],
+                total=float(product['quantity']) * float(product['price'])
+            )
+
+
+    host = request.get_host()
+    paypal_dict = {
+        'business': settings.PAYPAL_RECEIVER_EMAIL,
+        'amount': total_amount,
+        'item_name': "Order-Item-No-" + str(order.id),
+        'invoice': "INVOICE-NO-" + str(order.id),
+        'currency_code': "USD",
+        "notify_url": 'http://{}{}'.format(host, reverse("payment:paypal-ipn")),
+        "return": 'http://{}{}'.format(host, reverse('payment:payment-completed')),
+        "cancel_return": 'http://{}{}'.format(host, reverse('payment:payment-failed')),
+    }
+    
+    form = PayPalPaymentsForm(initial=paypal_dict)
+    
+    return render(request, "store/checkout.html", {"cart_data": request.session['cart_data_obj'], 'total_cart_items': len(request.session['cart_data_obj']), 'cart_total_amount': cart_total_amount, 'form': form})

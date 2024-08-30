@@ -9,7 +9,12 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+        <script src="https://js.braintreegateway.com/web/dropin/1.43.0/js/dropin.min.js"></script>
+
     </head>
     <body>
         <header>
@@ -22,29 +27,54 @@
                     {% endfor %}
                 </select>
             </div>
-            <div>
+            <div class="header-links">
                 <a href="{% url 'store:product-list' %}">Shop</a>
+
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'userauths:logout' %}" class="auth-link">Logout</a>
+                {% else %}
+                <a href="{% url 'userauths:sign-in' %}" class="auth-link">Sign in</a>
+                {% endif %}
             </div>
-    
-            {% if request.user.is_authenticated %}
-            <a href="{% url 'userauths:logout' %}">Logout</a>
-            {% else %}
-            <a href="{% url 'userauths:sign-in' %}">Sign in</a>
-            {% endif %}
+            <!-- Cart -->
+            <div class="cart-container">
+                <a href="{% url 'store:cart' %}" class="cart-button">
+                    <i class="fas fa-shopping-cart cart-icon"></i>
+                    <!-- Cart Items Count -->
+                    <span class="cart-items-count">{{ request.session.cart_data_obj|length }}</span>
+                </a>
+                <!-- Dropdown Menu -->
+                <div class="cart-dropdown">
+                    <div class="cart-products">
+                        <!-- This will be populated with JavaScript -->
+                    </div>
+                    <a href="{% url 'store:cart' %}" class="cart-view-button">View Cart</a>
+                    <a href="{% url 'store:checkout' %}" class="cart-checkout-button">Checkout</a>
+                </div>
+            </div>
+            <!-- Search -->
+            <div class="search-container">
+                <form action="{% url 'store:search'%}" method="GET">
+                    <input type="text" placeholder="Search for products..." name="query" class="search-input"/>
+                    <button type="submit" class="search-button">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </form>
+            </div>
         </header>
         <div class="content-container">
             {% if messages %}
                 {% for message in messages %}
-                    <div class="messages">
-                        <strong>{{ message }}</strong>
-                    </div>
+                <div class="messages">
+                    <strong>{{ message }}</strong>
+                </div>
                 {% endfor %}
             {% endif %}
-    
+
             {% block content %}
-    
+
             {% endblock content %}
         </div>
         <script src="{% static 'js/function.js' %}"></script>
     </body>
-    </html>
+</html>

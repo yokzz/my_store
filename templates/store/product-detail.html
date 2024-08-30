@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block content %}
-
 <!-- Product Section -->
 <div class="product-section">
 
@@ -22,9 +21,9 @@
         {% if product_images %}
         <h2>Other images</h2>
         <div class="extra-images">
-            {% for img in product_images %}
+            {% for image in product_images %}
             <div class="extra-image">
-                <img src="{{ img.url }}" alt="Additional Image" height="128" width="128" />
+                <img src="{{ image.images }}" alt="Additional Image" height="128" width="128" />
             </div>
             {% endfor %}
         </div>
@@ -40,7 +39,7 @@
 
         <!-- Product Title -->
         <div class="product-title">
-            <a href="{% url 'store:product-detail' product.pid %}">{{ product.title|truncatechars:50 }}</a>
+            <h4>{{ product.title|truncatechars:50 }}</h4>
         </div>
 
         <!-- Product Description -->
@@ -55,22 +54,33 @@
 
         <!-- Product Price -->
         <div class="product-price">
-            <span>${{ product.price }}</span>
+            <span>$</span><span id="current-price" class="current-price-{{ product.id }}">{{ product.price }}</span>
             <br>
             {% if product.old_price %}
-            <span class="old-price">${{ product.old_price }}</span>
+            <span>$</span><span class="old-price">{{ product.old_price }}</span>
             {% endif %}
         </div>
 
         <!-- Product Properties -->
-        <div class="product-properties">
             <small>Type: {{ product.type }}</small>
             <small>SKU: {{ product.sku }}</small>
             <small>MFD: {{ product.mfd|date:"d M, Y" }}</small>
             <small>Life: {{ product.life }}</small>
             <small>Stock: {{ product.stock_count }} Item{{ product.stock_count|pluralize }} In Stock</small>
         </div>
+
+        <!-- Add to Cart -->
+        <div>
+            <input type="number" value="1" min="1" id="product-quantity" class="product-quantity-{{ product.id }}"/>
+            <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
+            <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
+            <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
+            <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
+            <button type="submit" class="add-to-cart-btn" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add</button>
+        </div>
+
     </div>
+
 
     <br>
 
@@ -256,6 +266,15 @@
                 <span>${{ related_product.price }}</span>
                 <br>
                 <span class="old-price">${{ related_product.old_price }}</span>
+            </div>
+            <!-- Add to Cart -->
+            <div>
+                <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ product.id }}"/>
+                <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
+                <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
+                <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
+                <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
+                <button type="submit" class="add-to-cart-btn" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add</button>
             </div>
         </div>
         {% endfor %}

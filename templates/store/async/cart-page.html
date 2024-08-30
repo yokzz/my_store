@@ -1,0 +1,32 @@
+<h3 class="cart-heading">You have {{ total_cart_items }} product{{ total_cart_items|pluralize }} in your cart</h3>
+    <div class="cart-items">
+        {% for product_id, product in cart_data.items %}
+        <div class="cart-item">
+            <!-- Product Image -->
+            <div class="cart-item-image">
+                <img src="{{ product.image }}" alt="{{ product.title }}" />
+            </div>
+            <!-- Product Details -->
+            <div class="cart-item-details">
+                <a href="{% url 'store:product-detail' product.pid %}" class="cart-item-title">{{ product.title|truncatechars:50 }}</a>
+                <p class="cart-item-price">${{ product.price|floatformat:2 }}</p>
+                <input type="number" value="{{ product.quantity }}" min="1" id="product-quantity-{{ product_id }}" class="cart-item-quantity" />
+                <p class="cart-item-subtotal">${% widthratio product.price 1 product.quantity %}</p>
+            </div>
+            <!-- Manage Product -->
+            <div>
+                <button class="update-product" data-product="{{ product_id }}"><i class="fa-solid fa-arrows-rotate"></i></button>
+                <button class="delete-product" data-product="{{ product_id }}"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </div>
+        {% endfor %}
+        <!-- Cart Total -->
+        <div class="cart-total">
+            <h4>Total: ${{ cart_total_amount|floatformat:2 }}</h4>
+        </div>
+        {% if total_cart_items %}
+        <div>
+            <a href="{% url 'store:checkout' %}">Proceed to Checkout</a>
+        </div>
+        {% endif %}
+    </div>
