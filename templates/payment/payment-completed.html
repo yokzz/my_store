@@ -15,7 +15,7 @@
                         </td>
 
                         <td>
-                            Invoice #: <br />
+                            Invoice #: {{ order.id }}<br />
                             Created: January 1, 2023<br />
                             Due: February 1, 2023
                         </td>
@@ -77,7 +77,7 @@
         <tr class="total">
             <td></td>
 
-            <td>Subtotal: ${{ cart_total_amount }}</td>
+            <td>Subtotal: ${{ cart_total_amount|floatformat:2 }}</td>
         </tr>
     </table>
 </div>

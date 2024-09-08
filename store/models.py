@@ -154,7 +154,7 @@ class CartOrder(models.Model):
     price = models.DecimalField(max_digits=999999999, decimal_places=2, default="1.99")
     paid_status = models.BooleanField(default=False)
     order_date = models.DateTimeField(auto_now_add=True)
-    product_status = models.CharField(choices=STATUS_CHOICE, max_length=30, default="processing")
+    order_status = models.CharField(choices=STATUS_CHOICE, max_length=30, default="processing")
     
     class Meta:
         verbose_name_plural = "Card Order"
@@ -217,6 +217,7 @@ class Wishlist(models.Model):
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     address = models.CharField(max_length=127, null=True)
+    phone_number = models.CharField(max_length=127, null=True)
     city = models.CharField(max_length=63, blank=True, null=True)
     post_code = models.IntegerField(blank=True, null=True)
     status = models.BooleanField(default=False)

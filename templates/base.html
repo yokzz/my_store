@@ -52,6 +52,7 @@
                     <a href="{% url 'store:checkout' %}" class="cart-checkout-button">Checkout</a>
                 </div>
             </div>
+            <a href="{% url 'customer:dashboard' %}"><i class="fa-solid fa-user"></i> My account</a>
             <!-- Search -->
             <div class="search-container">
                 <form action="{% url 'store:search'%}" method="GET">

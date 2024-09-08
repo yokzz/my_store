@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Hello, {{ request.user.username|title }}</h2>
+
+<h3>Orders: </h3>
+<div class="invoice-box">
+    <table>
+        <tr class="heading">
+            <td>Order</td>
+            <td style="text-align: left;">Total</td>
+            <td>Paid Status</td>
+            <td>Order Status</td>
+            <td>Order Date</td>
+            <td>Check Order</td>
+        </tr>
+
+        {% for order in orders %}
+        <tr class="item">
+            <td>#{{ order.id }}</td>
+            <td class="product-price" style="text-align: left;">${{ order.price }}</td>
+            <td>
+                {% if order.paid_status == True %}
+                    <i class="fa-solid fa-check"></i>
+                {% else %}
+                    <i class="fa-solid fa-xmark"></i>
+                {% endif %}
+            </td>
+            <td>{{ order.order_status }}</td>
+            <td>{{ order.order_date }}</td>
+            <td><a href="{% url 'customer:order-detail' order.id %}">View</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+<div>
+    <form method="POST">
+        {% csrf_token %}
+        <h4>Add Address</h4>
+        <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" id="address" name="address" required placeholder="Main Street, 123" class="form-input">
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone" required placeholder="+1 (123) 456-7890" class="form-input">
+        </div>
+        <div class="form-group">
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" required placeholder="New York" class="form-input">
+        </div>
+        <div class="form-group">
+            <label for="phone">Post Code</label>
+            <input type="text" id="post_code" name="post_code" required placeholder="10118" class="form-input">
+        </div>
+        <button type="submit" class="">Submit</button>
+    </form>
+</div>
+
+<div>
+    {% for address in address_obj %}
+    <h4>Address {{ forloop.counter }}</h4>
+    <address>
+        Address: {{ address.address }}
+        <br>
+        Phone number: {{ address.phone_number }}
+        <br>
+        City: {{ address.city }}
+        <br>
+        Post Code: {{ address.post_code }}
+        {% if address.status == True %}
+            <i data-address-id="{{ address.id }}" class="fa-solid fa-check check-{{ address.id }} check"></i>
+            <button data-address-id="{{ address.id }}" class="make-default button-{{ address.id }} action_btn" style="display: none;">Make Default</button>
+        {% else %}
+            <i data-address-id="{{ address.id }}" style="display: none;" class="fa-solid fa-check check-{{ address.id }} check"></i>
+            <button data-address-id="{{ address.id }}" class="make-default button-{{ address.id }} action_btn">Make Default</button>
+        {% endif %}
+    {% endfor %}
+</address>
+</div>
+
+{% endblock content %}

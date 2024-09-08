@@ -23,7 +23,7 @@
         <div class="extra-images">
             {% for image in product_images %}
             <div class="extra-image">
-                <img src="{{ image.images }}" alt="Additional Image" height="128" width="128" />
+                <img src="{{ image.images.url }}" alt="Additional Image" height="128" width="128" />
             </div>
             {% endfor %}
         </div>
@@ -179,7 +179,11 @@
         <div class="review-statistics">
             <h1>Customer reviews</h1>
             <div class="average-rating">
+                {% if average_rating.rating %}
                 <span class="rating-value">{{ average_rating.rating|floatformat:1 }}</span> out of 5.0
+                {% else %}
+                <span class="rating-value">0.0</span> out of 5.0
+                {% endif %}
             </div>
             <div class="star-progress-container">
                 <!-- 5 star progress -->

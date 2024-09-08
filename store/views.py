@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 
+
 from store.models import Product, Category, Vendor, CartOrder, CartOrderItems, Wishlist, Tags, ProductImages, ProductReview, Address 
 from store.forms import ProductReviewForm
 
@@ -35,7 +36,7 @@ def product_list_view(request):
 def product_detail_view(request, pid):
     product = Product.objects.get(pid=pid)
     products = Product.objects.filter(category=product.category).exclude(pid=pid)[:4]
-    product_images = product.product_image.all()
+    product_images = product.product_images.all()
 
     # Getting all reviews related to product
     reviews = ProductReview.objects.filter(product=product).order_by("-date")
@@ -199,8 +200,9 @@ def cart_view(request):
             cart_total_amount += int(product['quantity']) * float(product['price'])           
         
         return render(request, "store/cart.html", {"cart_data": request.session['cart_data_obj'], 'total_cart_items': len(request.session['cart_data_obj']), 'cart_total_amount':cart_total_amount})
+    
     else:
-        return redirect("store:index")
+        return render(request, "store/cart.html", {'total_cart_items': 0, 'cart_total_amount': 0})
     
 def delete_from_cart(request):
     product_id = str(request.GET['id'])
@@ -258,7 +260,7 @@ def checkout_view(request):
         # Getting total amount for the cart
         for product_id, product in request.session['cart_data_obj'].items():
             cart_total_amount += int(product['quantity']) * float(product['price']) 
-
+            
             cart_order_products = CartOrderItems.objects.create(
                 order=order,
                 invoice_number="INVOICE_NO-" + str(order.id),
@@ -268,20 +270,29 @@ def checkout_view(request):
                 price=product['price'],
                 total=float(product['quantity']) * float(product['price'])
             )
-
-
-    host = request.get_host()
-    paypal_dict = {
-        'business': settings.PAYPAL_RECEIVER_EMAIL,
-        'amount': total_amount,
-        'item_name': "Order-Item-No-" + str(order.id),
-        'invoice': "INVOICE-NO-" + str(order.id),
-        'currency_code': "USD",
-        "notify_url": 'http://{}{}'.format(host, reverse("payment:paypal-ipn")),
-        "return": 'http://{}{}'.format(host, reverse('payment:payment-completed')),
-        "cancel_return": 'http://{}{}'.format(host, reverse('payment:payment-failed')),
-    }
+            
     
-    form = PayPalPaymentsForm(initial=paypal_dict)
+        host = request.get_host()
+        paypal_dict = {
+            'business': settings.PAYPAL_RECEIVER_EMAIL,
+            'amount': total_amount,
+            'item_name': "Order-Item-No-" + str(order.id),
+            'invoice': "INVOICE-NO-" + str(order.id),
+            'currency_code': "USD",
+            "notify_url": 'http://{}{}'.format(host, reverse("payment:paypal-ipn")),
+            "return": 'http://{}{}'.format(host, reverse('payment:payment-completed')),
+            "cancel_return": 'http://{}{}'.format(host, reverse('payment:payment-failed')),
+        }
+
+        form = PayPalPaymentsForm(initial=paypal_dict)
+        
+        try:
+            active_address = Address.objects.get(user=request.user, status=True)
+        except:
+            active_address = None
+        
+        return render(request, "store/checkout.html", {"cart_data": request.session['cart_data_obj'], 'total_cart_items': len(request.session['cart_data_obj']), 'cart_total_amount': cart_total_amount, 'form': form, 'active_address': active_address})
     
-    return render(request, "store/checkout.html", {"cart_data": request.session['cart_data_obj'], 'total_cart_items': len(request.session['cart_data_obj']), 'cart_total_amount': cart_total_amount, 'form': form})
+    else:
+        return redirect("store:cart")
+

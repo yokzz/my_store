@@ -226,4 +226,33 @@ $(document).ready(function (){
         })
 
     })
+
+    // Making Address Default
+    $(document).on("click", ".make-default", function(){
+        let id = $(this).attr("data-address-id")
+        let this_val = $(this)
+
+        console.log("ID:", id);
+        console.log("Element:", this_val)
+
+        $.ajax({
+            url: "/customer/make-address-default",
+            data: {
+                "id": id,
+            },
+            dataType: "json",
+            success: function(response){
+                console.log("Address is now Default");
+                if (response.boolean == true){
+
+                    $(".check").hide()
+                    $(".action_btn").show()
+
+                    $(".check-" + id).show()
+                    $(".button-" + id).hide()
+                }
+            }
+        })
+    })
+
 })

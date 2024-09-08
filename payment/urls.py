@@ -5,10 +5,10 @@ urlpatterns = [
     # Paypal URL
      path('paypal/', include("paypal.standard.ipn.urls")),
     
-    # Payment Completed
+    # Payment Completed URL 
     path('payment-completed/', payment_completed_view, name="payment-completed"),
     
-    # Payment Failed
+    # Payment Failed URL
     path('payment-failed/', payment_failed_view, name="payment-failed"),
 ]
 
