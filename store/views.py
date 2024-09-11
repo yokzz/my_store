@@ -7,11 +7,15 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 
+import uuid
+
 
 from store.models import Product, Category, Vendor, CartOrder, CartOrderItems, Wishlist, Tags, ProductImages, ProductReview, Address 
 from store.forms import ProductReviewForm
 
 from paypal.standard.forms import PayPalPaymentsForm
+from paypal.standard.models import ST_PP_COMPLETED
+from paypal.standard.ipn.signals import valid_ipn_received
 
 
 def index(request):
@@ -250,34 +254,15 @@ def checkout_view(request):
         # Getting total amount for paypal amount
         for product_id, product in request.session['cart_data_obj'].items():
             total_amount += int(product['quantity']) * float(product['price'])
-
-        # Creating order object
-        order = CartOrder.objects.create(
-            user=request.user,
-            price = total_amount,
-        )
+            
+        order_id = uuid.uuid4()    
         
-        # Getting total amount for the cart
-        for product_id, product in request.session['cart_data_obj'].items():
-            cart_total_amount += int(product['quantity']) * float(product['price']) 
-            
-            cart_order_products = CartOrderItems.objects.create(
-                order=order,
-                invoice_number="INVOICE_NO-" + str(order.id),
-                item=product['title'],
-                image=product['image'],
-                quantity=product['quantity'],
-                price=product['price'],
-                total=float(product['quantity']) * float(product['price'])
-            )
-            
-    
         host = request.get_host()
         paypal_dict = {
             'business': settings.PAYPAL_RECEIVER_EMAIL,
             'amount': total_amount,
-            'item_name': "Order-Item-No-" + str(order.id),
-            'invoice': "INVOICE-NO-" + str(order.id),
+            'item_name': "Order-Item-No-" + str(order_id),
+            'invoice': "INVOICE-NO-" + str(order_id),
             'currency_code': "USD",
             "notify_url": 'http://{}{}'.format(host, reverse("payment:paypal-ipn")),
             "return": 'http://{}{}'.format(host, reverse('payment:payment-completed')),
@@ -285,14 +270,76 @@ def checkout_view(request):
         }
 
         form = PayPalPaymentsForm(initial=paypal_dict)
+            # order = CartOrder.objects.create(
+            #     user=request.user,
+            #     price = total_amount,
+            # )
+        
+        # Getting total amount for the cart
+        for product_id, product in request.session['cart_data_obj'].items():
+            cart_total_amount += int(product['quantity']) * float(product['price']) 
+            
+            #     cart_order_products = CartOrderItems.objects.create(
+            #         order=order,
+            #         invoice_number="INVOICE_NO-" + str(order.id),
+            #         item=product['title'],
+            #         image=product['image'],
+            #         quantity=product['quantity'],
+            #         price=product['price'],
+            #         total=float(product['quantity']) * float(product['price'])
+            #     )
+        
         
         try:
             active_address = Address.objects.get(user=request.user, status=True)
         except:
             active_address = None
         
-        return render(request, "store/checkout.html", {"cart_data": request.session['cart_data_obj'], 'total_cart_items': len(request.session['cart_data_obj']), 'cart_total_amount': cart_total_amount, 'form': form, 'active_address': active_address})
+        
+        return render(request, "store/checkout.html", {
+            "cart_data": request.session['cart_data_obj'],
+            'total_cart_items': len(request.session['cart_data_obj']),
+            'cart_total_amount': cart_total_amount,
+            'form': form,
+            'active_address': active_address})
     
     else:
         return redirect("store:cart")
+    
+@login_required
+def wishlist_view(request):
+    wishlist_obj = Wishlist.objects.all()
+    
+    context = {
+        "wishlist_obj": wishlist_obj,
+    }
+    
+    return render(request, "store/wishlist.html", context)
+    
+@login_required
+def add_to_wishlist(request):
+    id = request.GET['id']
+    product = Product.objects.get(id=id)
+    
+    context = {
+        "product": product
+    }
+    
+    wishlist_count = Wishlist.objects.filter(product=product, user=request.user).count()
+    print(wishlist_count)
 
+    if wishlist_count > 0:
+        context = {
+            "bool": True
+        }
+    else:
+        new_wishlist = Wishlist.objects.create(
+            product=product,
+            user=request.user
+        )
+    
+        context = {
+            "bool": True
+        }
+    
+    return JsonResponse(context)

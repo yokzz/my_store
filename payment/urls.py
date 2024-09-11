@@ -3,7 +3,7 @@ from payment.views import payment_completed_view, payment_failed_view
 
 urlpatterns = [
     # Paypal URL
-     path('paypal/', include("paypal.standard.ipn.urls")),
+    path('paypal/', include("paypal.standard.ipn.urls")),
     
     # Payment Completed URL 
     path('payment-completed/', payment_completed_view, name="payment-completed"),

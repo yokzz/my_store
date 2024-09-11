@@ -255,4 +255,28 @@ $(document).ready(function (){
         })
     })
 
+    // Adding to wishlist
+    $(document).on("click", ".add-to-wishlist", function(){
+        let product_id = $(this).attr("data-product-item")
+        let this_val = $(this)
+
+        console.log("ID:", product_id)
+        console.log("Current element: ", this_val)
+        
+        $.ajax({
+            url: "/add-to-wishlist",
+            data: {
+                "id": product_id,
+            },
+            dataType: "json",
+            beforeSend: function(){
+                this_val.html('<i class="fa-solid fa-heart"></i>')
+            },
+            success: function(response){
+                if (response.bool == true) {
+                    console.log("Added to wishlist")
+                }
+            }
+        })
+    })
 })

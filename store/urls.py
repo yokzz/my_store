@@ -1,5 +1,5 @@
 from django.urls import path
-from store.views import index, category_list_view, product_list_view, product_detail_view, category_product_list_view, vendor_list_view, vendor_detail_view, ajax_add_review, search_view, product_filter_view, add_to_cart, cart_view, delete_from_cart, update_cart, checkout_view
+from store.views import index, category_list_view, product_list_view, product_detail_view, category_product_list_view, vendor_list_view, vendor_detail_view, ajax_add_review, search_view, product_filter_view, add_to_cart, cart_view, delete_from_cart, update_cart, checkout_view, wishlist_view, add_to_wishlist
 
 urlpatterns = [
     # Home page URL
@@ -41,6 +41,11 @@ urlpatterns = [
     # Checkout URL
     path("checkout/", checkout_view, name="checkout"),
     
+    # Wishlist Page URL
+    path("wishlist/", wishlist_view, name="wishlist"),
+    
+    # Adding to Wishlist URL
+    path("add-to-wishlist/", add_to_wishlist, name="add-to-wishlist"),
 ]
 
 app_name = "store"

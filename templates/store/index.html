@@ -43,7 +43,9 @@
                 <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
                 <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
                 <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
+                
                 <button type="submit" class="add-to-cart-btn" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add</button>
+                <button type="submit" class="add-to-wishlist" style="border: none; background: none;" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart"></i></button>
             </div>
         </div>
         {% endfor %}

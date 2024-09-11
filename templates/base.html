@@ -36,6 +36,13 @@
                 <a href="{% url 'userauths:sign-in' %}" class="auth-link">Sign in</a>
                 {% endif %}
             </div>
+            <!-- Wishlist -->
+            <div>
+                <a href="{% url 'store:wishlist' %}">
+                <i class="fa-solid fa-heart"></i>
+                <span>{{ wishlist }}</span>
+                </a>
+            </div>
             <!-- Cart -->
             <div class="cart-container">
                 <a href="{% url 'store:cart' %}" class="cart-button">
