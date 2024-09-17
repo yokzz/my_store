@@ -7,7 +7,7 @@ urlpatterns = [
     path("dashboard/", dashboard, name="dashboard"),
 
     # Order Detail URL
-    path("dashboard/order/no-<int:id>", order_detail, name="order-detail"),
+    path("dashboard/order/no-<oid>", order_detail, name="order-detail"),
 
     # Making Address Default URL
     path("make-address-default", make_address_default, name="make-address-default"),

@@ -256,7 +256,10 @@ def update_cart(request):
     return JsonResponse({"data": data, 'total_cart_items': len(request.session['cart_data_obj'])})
 
 def save_checkout_info(request):
-   if request.method == "POST":
+    cart_total_amount = 0
+    total_amount = 0
+    
+    if request.method == "POST":
         first_name = request.POST["first_name"]
         last_name = request.POST["last_name"]
         email = request.POST["email"]
@@ -277,33 +280,92 @@ def save_checkout_info(request):
         request.session["country"] = country
         request.session["post_code"] = post_code
         
-        print(request.session["first_name"])
-        
-        return redirect("store:checkout")
+        if 'cart_data_obj' in request.session: 
+            # Getting total amount for paypal amount
+            for product_id, product in request.session['cart_data_obj'].items():
+                total_amount += int(product['quantity']) * float(product['price'])
 
-def checkout_view(request):
-    cart_total_amount = 0
-    total_amount = 0
+            order = CartOrder.objects.create(
+                    user=request.user,
+                    price = total_amount,
+                    first_name = first_name,
+                    last_name = last_name,
+                    email = email,
+                    phone_number = phone,
+                    address = address,
+                    city = city,
+                    state = state,
+                    country = country,
+                    post_code = post_code,
+                )
+            
+            del request.session['first_name']
+            del request.session['last_name']
+            del request.session['email']
+            del request.session['phone']
+            del request.session['address']
+            del request.session['city']
+            del request.session['state']
+            del request.session['country']
+            del request.session['post_code']
+            
+            for product_id, product in request.session['cart_data_obj'].items():
+                cart_total_amount += int(product['quantity']) * float(product['price']) 
+                
+                cart_order_products = CartOrderItems.objects.create(
+                    order=order,
+                    invoice_number="INVOICE_NO-" + str(order.id),
+                    item=product['title'],
+                    image=product['image'],
+                    quantity=product['quantity'],
+                    price=product['price'],
+                    total=float(product['quantity']) * float(product['price'])
+                )
+    
+        return redirect("store:checkout", order.oid)
+
+def checkout_view(request, oid):
+    order = CartOrder.objects.get(oid=oid)
+    orders = CartOrder.objects.filter(user=request.user)
+    order_items = CartOrderItems.objects.filter(order=order)
     
     if request.method == "POST":
         code = request.POST["code"]
-        coupon = Coupon.objects.get(code=code, active=True)
+        try:
+            coupon = Coupon.objects.get(code=code, active=True)
+        except: 
+            coupon = None
+            
+        if coupon:
+            for order_obj in orders:
+                if coupon in order_obj.coupons.all():
+                    messages.warning(request, "Coupon already activated")
+                    return redirect("store:checkout", order.oid)
+                
+            if coupon.uses <= coupon.use_count:
+                messages.warning(request, "Coupon is expired")
+                return redirect("store:checkout", order.oid)
+            
+            else:
+                discount = order.price * coupon.discount / 100
+                order.coupons.add(coupon)
+                coupon.use_count += 1
+                order.price-= discount
+                order.saved += discount
+                coupon.save()
+                order.save()
+                
+                messages.success(request, "Coupon Activated")
+                return redirect("store:checkout", order.oid)
+        else:
+            messages.error(request, "Coupon does not exist")
     
-    # Checking if cart_data_obj session still exists
-    if 'cart_data_obj' in request.session: 
-        # Getting total amount for paypal amount
-        for product_id, product in request.session['cart_data_obj'].items():
-            total_amount += int(product['quantity']) * float(product['price'])
-            cart_total_amount += int(product['quantity']) * float(product['price'])    
-        
-        return render(request, "store/checkout.html", {
-            "cart_data": request.session['cart_data_obj'],
-            'total_cart_items': len(request.session['cart_data_obj']),
-            'cart_total_amount': cart_total_amount,
-        })
+    context = {
+        "order": order,
+        "order_items": order_items,
+    }
     
-    else:
-        return redirect("store:cart")
+    return render(request, "store/checkout.html", context)
     
 @login_required
 def wishlist_view(request):

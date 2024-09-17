@@ -27,17 +27,19 @@
                 <td>Order</td>
                 <td style="text-align: left;">Total</td>
                 <td>Order Status</td>
+                <td>Paid Status</td>
                 <td>Order Date</td>
                 <td>Check Order</td>
             </tr>
             
             {% for order in order_list %}
             <tr class="item">
-                <td>#{{ order.id }}</td>
+                <td>#{{ order.oid }}</td>
                 <td class="product-price" style="text-align: left;">${{ order.price }}</td>
                 <td>{{ order.order_status }}</td>
+                <td>{{ order.paid_status }}</td>
                 <td>{{ order.order_date }}</td>
-                <td><a href="{% url 'customer:order-detail' order.id %}">View</a></td>
+                <td><a href="{% url 'customer:order-detail' order.oid %}">View</a></td>
             </tr>
             {% endfor %}
         </table>

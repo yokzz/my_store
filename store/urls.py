@@ -39,7 +39,7 @@ urlpatterns = [
     path("view-cart/", cart_view, name="cart"),
     
     # Checkout URL
-    path("checkout/", checkout_view, name="checkout"),
+    path("checkout/<oid>", checkout_view, name="checkout"),
     
     # Save Checkout Info URL
     path("save-checkout-info/", save_checkout_info, name="save-checkout-info"),

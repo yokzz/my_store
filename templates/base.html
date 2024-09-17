@@ -57,7 +57,7 @@
                         <!-- This will be populated with JavaScript -->
                     </div>
                     <a href="{% url 'store:cart' %}" class="cart-view-button">View Cart</a>
-                    <a href="{% url 'store:checkout' %}" class="cart-checkout-button">Checkout</a>
+                    {% comment %} <a href="{% url 'store:checkout' order.oid %}" class="cart-checkout-button">Checkout</a> {% endcomment %}
                 </div>
             </div>
             <a href="{% url 'customer:dashboard' %}"><i class="fa-solid fa-user"></i> My account</a>

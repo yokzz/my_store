@@ -58,13 +58,13 @@ def dashboard(request):
     
     return render(request, 'customer/dashboard.html', context)
 
-def order_detail(request, id):
-    order = CartOrder.objects.get(user=request.user, id=id)
-    products = CartOrderItems.objects.filter(order=order)
+def order_detail(request, oid):
+    order = CartOrder.objects.get(oid=oid)
+    order_items = CartOrderItems.objects.filter(order=order)
     
     context = {
         "order": order,
-        "products": products,
+        "order_items": order_items,
     }
     
     return render(request, "customer/order-detail.html", context)

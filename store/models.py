@@ -172,7 +172,7 @@ class CartOrder(models.Model):
     
     paid_status = models.BooleanField(default=False)
     order_date = models.DateTimeField(auto_now_add=True)
-    oid = ShortUUIDField(unique=True, length=2, max_length=30, prefix="o", alphabet="1234567890") 
+    oid = ShortUUIDField(unique=True, length=2, max_length=30, alphabet="1234567890") 
     order_status = models.CharField(choices=STATUS_CHOICE, max_length=30, default="processing")
     
     stripe_payment_intent = models.CharField(max_length=1000, blank=True, null=True)
@@ -253,7 +253,9 @@ class Coupon(models.Model):
     code = models.CharField(max_length=63)
     discount = models.IntegerField(default=1)
     active = models.BooleanField(default=True)
-    use_count = models.IntegerField()
+    uses = models.IntegerField()
+    use_count = models.IntegerField(default=0)
+    
     
     def __str__(self):
         return self.code
