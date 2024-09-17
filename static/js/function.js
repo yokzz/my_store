@@ -275,8 +275,89 @@ $(document).ready(function (){
             success: function(response){
                 if (response.bool == true) {
                     console.log("Added to wishlist")
+                    $(".wishlist-items-count").text(response.wishlist_count)
                 }
             }
         })
     })
+
+    // Remove from wishlist
+    $(document).on("click", ".remove-from-wishlist", function(){
+        let wishlist_id = $(this).attr("data-wishlist-product")
+        let this_val = $(this)
+
+        console.log("wishlist ID is:", wishlist_id);
+
+        $.ajax({
+            url: "/remove-from-wishlist",
+            data: {
+                "id": wishlist_id,
+            },
+            dataType: "json",
+            beforeSend: function(){
+                console.log("Removing product from wishlist...")
+            },
+            success: function(response){
+                $("#wishlist").html(response.data)
+                $(".wishlist-items-count").text(response.data.bool)
+                console.log(response.data.bool)
+            }
+        })
+    })
+
+    $(document).on("submit", "#contact-form", function(event){
+        event.preventDefault()
+        
+        console.log("Submited...");
+
+        let first_name = $("#first_name").val()
+        let last_name = $("#last_name").val()
+        let email = $("#email").val()
+        let phone_number = $("#phone").val()
+        let subject = $("#subject").val()
+        let message = $("#message").val()
+
+        $.ajax({
+            url:"/customer/ajax-contact-us",
+            data: {
+                "first_name": first_name,
+                "last_name": last_name,
+                "email": email,
+                "phone_number": phone_number,
+                "subject": subject,
+                "message": message,
+            },
+            dataType: "json",
+            beforeSend: function(){
+                console.log("Sending data to server...");
+            },
+            success: function(response){
+                console.log("Sent data to server.")
+                $("#contact-form").hide()
+                $("#message-response").html("Message sent successfully")
+            }
+        })
+    })
 })
+
+function showTab(tabId) {
+    const tabs = document.querySelectorAll('.tab-content')
+
+    tabs.forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.getElementById(tabId).classList.add('active');
+}
+
+function initPayPalButton() {
+    paypal.Buttons({
+        style: {
+            shape: 'rect',
+            color: 'gold',
+            layout: 'vertical',
+            label: 'paypal',
+        },
+    }).render('#paypal-button-container');
+}
+
+initPayPalButton();

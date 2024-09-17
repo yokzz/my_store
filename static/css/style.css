@@ -783,3 +783,26 @@ input[type="number"] {
 .invoice-box.rtl table tr td:nth-child(2) {
     text-align: left;
 }
+
+.tabs {
+    display: flex;
+    cursor: pointer;
+}
+.tab {
+    padding: 10px 20px;
+    background: lightgrey;
+    margin-right: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.tab-content {
+    display: none;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 10px;
+    background: #f9f9f9;
+}
+.tab-content.active {
+    display: block;
+}

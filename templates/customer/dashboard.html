@@ -3,80 +3,158 @@
 
 <h2>Hello, {{ request.user.username|title }}</h2>
 
-<h3>Orders: </h3>
-<div class="invoice-box">
-    <table>
-        <tr class="heading">
-            <td>Order</td>
-            <td style="text-align: left;">Total</td>
-            <td>Paid Status</td>
-            <td>Order Status</td>
-            <td>Order Date</td>
-            <td>Check Order</td>
-        </tr>
-
-        {% for order in orders %}
-        <tr class="item">
-            <td>#{{ order.id }}</td>
-            <td class="product-price" style="text-align: left;">${{ order.price }}</td>
-            <td>
-                {% if order.paid_status == True %}
-                    <i class="fa-solid fa-check"></i>
-                {% else %}
-                    <i class="fa-solid fa-xmark"></i>
-                {% endif %}
-            </td>
-            <td>{{ order.order_status }}</td>
-            <td>{{ order.order_date }}</td>
-            <td><a href="{% url 'customer:order-detail' order.id %}">View</a></td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-<div>
-    <form method="POST">
-        {% csrf_token %}
-        <h4>Add Address</h4>
-        <div class="form-group">
-            <label for="address">Address</label>
-            <input type="text" id="address" name="address" required placeholder="Main Street, 123" class="form-input">
-        </div>
-        <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="text" id="phone" name="phone" required placeholder="+1 (123) 456-7890" class="form-input">
-        </div>
-        <div class="form-group">
-            <label for="city">City</label>
-            <input type="text" id="city" name="city" required placeholder="New York" class="form-input">
-        </div>
-        <div class="form-group">
-            <label for="phone">Post Code</label>
-            <input type="text" id="post_code" name="post_code" required placeholder="10118" class="form-input">
-        </div>
-        <button type="submit" class="">Submit</button>
-    </form>
+<div class="tabs">
+    <div class="tab" onclick="showTab('tab1')">Dashboard</div>
+    <div class="tab" onclick="showTab('tab2')">Orders</div>
+    <div class="tab" onclick="showTab('tab3')">Shipping address</div>
+    <div class="tab" onclick="showTab('tab4')">Profile</div>
+    
 </div>
 
-<div>
-    {% for address in address_obj %}
-    <h4>Address {{ forloop.counter }}</h4>
-    <address>
-        Address: {{ address.address }}
-        <br>
-        Phone number: {{ address.phone_number }}
-        <br>
-        City: {{ address.city }}
-        <br>
-        Post Code: {{ address.post_code }}
-        {% if address.status == True %}
+<!-- Dashboard Tab -->
+<div id="tab1" class="tab-content active">
+    <div>
+        <canvas style="height: 50px; "id="myChart"></canvas>
+      </div>
+</div>
+
+<!-- Orders Tab -->
+<div id="tab2" class="tab-content">
+    <h3>Orders: </h3>
+    <div class="invoice-box">
+        <table>
+            <tr class="heading">
+                <td>Order</td>
+                <td style="text-align: left;">Total</td>
+                <td>Order Status</td>
+                <td>Order Date</td>
+                <td>Check Order</td>
+            </tr>
+            
+            {% for order in order_list %}
+            <tr class="item">
+                <td>#{{ order.id }}</td>
+                <td class="product-price" style="text-align: left;">${{ order.price }}</td>
+                <td>{{ order.order_status }}</td>
+                <td>{{ order.order_date }}</td>
+                <td><a href="{% url 'customer:order-detail' order.id %}">View</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<!-- Shipping Address Tab -->
+<div id="tab3" class="tab-content">
+    <div>
+        <form method="POST">
+            {% csrf_token %}
+            <h4>Add Shipping Address</h4>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" required placeholder="Main Street, 123" class="form-input">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" required placeholder="+1 (123) 456-7890" class="form-input">
+            </div>
+            <div class="form-group">
+                <label for="country">Country</label>
+                <input type="text" id="country" name="country" value="{{ active_address.country }}" required placeholder="United States" class="form-input">
+            </div>
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" value="{{ active_address.city }}" required placeholder="New York" class="form-input">
+            </div>
+            <div class="form-group">
+                <label for="state">State</label>
+                <input type="text" id="state" name="state" value="{{ active_address.state }}" required placeholder="New York State" class="form-input">
+            </div>
+            <div class="form-group">
+                <label for="post_code">Post Code</label>
+                <input type="text" id="post_code" name="post_code" required placeholder="10118" class="form-input">
+            </div>
+            <button type="submit" class="">Submit</button>
+        </form>
+    </div>
+    
+    <div>
+        {% for address in address_obj %}
+        <h4>Address {{ forloop.counter }}</h4>
+        <address>
+            Address: {{ address.address }}
+            <br>
+            Phone number: {{ address.phone_number }}
+            <br>
+            Country: {{ address.country }}
+            <br>
+            City: {{ address.country }}
+            <br>
+            State: {{ address.country }}
+            <br>
+            Post Code: {{ address.post_code }}
+            {% if address.status == True %}
             <i data-address-id="{{ address.id }}" class="fa-solid fa-check check-{{ address.id }} check"></i>
             <button data-address-id="{{ address.id }}" class="make-default button-{{ address.id }} action_btn" style="display: none;">Make Default</button>
-        {% else %}
+            {% else %}
             <i data-address-id="{{ address.id }}" style="display: none;" class="fa-solid fa-check check-{{ address.id }} check"></i>
             <button data-address-id="{{ address.id }}" class="make-default button-{{ address.id }} action_btn">Make Default</button>
-        {% endif %}
-    {% endfor %}
-</address>
+            {% endif %}
+            {% endfor %}
+        </address>
+    </div>
 </div>
 
+<!-- Profile Tab -->
+<div id="tab4" class="tab-content">
+    <h3>My Profile</h3>
+    <hr>
+    <!-- Customer Image -->
+    <div>
+        <img style="border-radius: 50%;" src="{{ profile.image.url }}" height="64" width="64"/>
+    </div>
+    <!-- Customer Full Name-->
+    <div>{{ profile.first_name }} {{ profile.last_name }}</div>
+    <!-- Customer Email -->
+    <div>{{ profile.email }}</div>
+    <!-- Customer Bio -->
+    <div>{{ profile.bio }}</div>
+    <!-- Customer Phone Number -->
+    <div>{{ profile.phone_number }}</div>
+    <!-- Verified Status -->
+    {% if profile.verified == True %}
+    <div>Verified <span style="color: green"><i class="fa-solid fa-check"></i></span></div>
+    {% else %}
+    <div>Unverified <span style="color: red"><i class="fa-solid fa-xmark"></i></span></div>
+    {% endif %}
+    <!-- Edit Profile Button -->
+    <a href="{% url 'customer:profile-edit' %}">Edit Profile</a>
+</div>
+
+
+<script>
+    const ctx = document.getElementById('myChart');
+    const labels = {{ month|safe }}
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+        labels: labels,
+        datasets: [{
+            label: 'Orders',
+            backgroundColor: 'gray',
+            borderColor: 'gray',
+            data: {{ total_orders|safe }},
+            borderWidth: 1
+        }]
+        },
+        options: {
+        scales: {
+            y: {
+            beginAtZero: true
+            }
+        }
+        }
+    });
+</script>
 {% endblock content %}

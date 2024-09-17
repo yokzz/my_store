@@ -15,7 +15,7 @@
                         </td>
 
                         <td>
-                            Invoice #: {{ order.id }}<br />
+                            Invoice #: {{ cart_data.order.oid }}<br />
                             Created: January 1, 2023<br />
                             Due: February 1, 2023
                         </td>
@@ -64,15 +64,13 @@
             <td>Price</td>
         </tr>
 
-        {% for product_id, product in cart_data.items %}
-            <tr class="item">
-                <td>{{ product.title }}</td>
-                
-                <td>{{ product.quantity }}</td>
+        <tr class="item">
+            <td>{{ cart_data.item.title }}</td>
+            
+            <td>{{ cart_data.quantity }}</td>
 
-                <td>${% widthratio product.price 1 product.quantity %}</td>
-            </tr>
-        {% endfor %}
+            <td>${% widthratio cart_data.price 1 cart_data.quantity %}</td>
+        </tr>
 
         <tr class="total">
             <td></td>

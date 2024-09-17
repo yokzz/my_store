@@ -26,7 +26,7 @@
             </div>
             <!-- Product Price -->
             <div class="product-price">
-                <span class="current-price">${{ product.price }}</span>
+                <span>$</span><span id="current-price" class="current-price-{{ product.id }}">{{ product.price }}</span>
                 <span class="old-price">${{ product.old_price }}</span>
             </div>
         </div>

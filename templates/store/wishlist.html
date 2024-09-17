@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2>Your wishlist</h2>
-<h4>There are  {{ wishlist_obj|length }} product{{ wishlist_obj|length|pluralize }} in your wishlist</h4>
-<div class="invoice-box">
+<div id="wishlist">
+    <h2>Your wishlist</h2>
+    <h4>There are  {{ wishlist_obj|length }} product{{ wishlist_obj|length|pluralize }} in your wishlist</h4>
+    <div class="invoice-box">
     <table>
         <tr class="heading">
             <td>Product</td>
@@ -18,17 +19,27 @@
         <tr class="item">
             <td style="text-align: left;"><img src="{{ wishlist.product.image.url }}" height="32" width="32"/></td>
             <td>{{ wishlist.product.title }}</td>
-            <td>{{ wishlist.product.price }}</td>
+            <td class="current-price-{{ wishlist.product.id }}">{{ wishlist.product.price }}</td>
             {% if wishlist.product.in_stock %}
                 <td>In Stock</td>
             {% else %}
                 <td>Out of stock</td>
             {% endif %}
-            <td><button type="submit" class="add-to-cart-btn" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add to cart</button></td>
-            <td><button class="delete-from-wishlist" data-product="{{ product_id }}"><i class="fa-solid fa-trash"></i></button></td>
+            <td>
+                <div>
+                <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ wishlist.product.id }}"/>
+                <input type="hidden" value="{{ wishlist.product.pid }}" class="product-pid-{{ wishlist.product.id }}"/>
+                <input type="hidden" value="{{ wishlist.product.id }}" class="product-id-{{ wishlist.product.id }}"/>
+                <input type="hidden" value="{{ wishlist.product.image.url }}" class="product-image-{{ wishlist.product.id }}"/>
+                <input type="hidden" value="{{ wishlist.product.title }}" class="product-title-{{ wishlist.product.id }}"/> 
+                <button type="submit" class="add-to-cart-btn" data-index="{{ wishlist.product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add to cart</button>
+            </div>
+            </td>
+            <td><button class="remove-from-wishlist" data-wishlist-product="{{ wishlist.id }}"><i class="fa-solid fa-trash"></i></button></td>
         </tr>
         {% endfor %}
     </table>
+    </div>
 </div>
 
 {% endblock content %}

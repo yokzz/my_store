@@ -22,7 +22,7 @@
         <div>To: ${{ max_price.price__max|floatformat:2 }}</div>
     </div>
     <div>
-        <input type="number" id="max_price" value="{{ min_price.price__min|floatformat:2 }}" min="{{ min_price.price__min }}" max="{{ max_price.price__max }}" style="width: 100%;" onkeyup="range.value=this.value"/>
+        <input type="number" id="max_price" value="{{ min_price.price__min|floatformat:2 }}" min="{{ min_price.price__min|floatformat:2 }}" max="{{ max_price.price__max|floatformat:2 }}" style="width: 100%;" onkeyup="range.value=this.value"/>
     </div>
     <div>
         <button id="price-filter-btn" type="button" style="width: 100%;">Filter</button>

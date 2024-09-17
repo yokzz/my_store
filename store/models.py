@@ -96,8 +96,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name="category")
     vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True, related_name="products")
     
-    price = models.DecimalField(max_digits=999999999, decimal_places=2, default="1.99")
-    old_price = models.DecimalField(max_digits=999999999, decimal_places=2, default="2.99")
+    price = models.DecimalField(max_digits=12, decimal_places=2, default="1.99")
+    old_price = models.DecimalField(max_digits=12, decimal_places=2, default="2.99")
     
     specifications = RichTextUploadingField(null=True, blank=True)
     type = models.CharField(max_length=63, default ="Organic", null=True, blank=True)
@@ -151,10 +151,31 @@ class ProductImages(models.Model):
 class CartOrder(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     
-    price = models.DecimalField(max_digits=999999999, decimal_places=2, default="1.99")
+    first_name = models.CharField(max_length=63)
+    last_name = models.CharField(max_length=63)
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=63)
+    
+    address = models.CharField(max_length=127, null=True)
+    country = models.CharField(max_length=127, blank=True, null=True)
+    city = models.CharField(max_length=127, blank=True, null=True)
+    state = models.CharField(max_length=127, blank=True, null=True)
+    post_code = models.IntegerField(blank=True, null=True)
+    
+    price = models.DecimalField(max_digits=12, decimal_places=2, default="0.00")
+    saved = models.DecimalField(max_digits=12, decimal_places=2, default="0.00")
+    coupons = models.ManyToManyField("store.Coupon", blank=True)
+    
+    shipping_method = models.CharField(max_length=127, blank=True, null=True)
+    tracking_id = models.CharField(max_length=127, blank=True, null=True)
+    tracking_website = models.CharField(max_length=127, blank=True, null=True)
+    
     paid_status = models.BooleanField(default=False)
     order_date = models.DateTimeField(auto_now_add=True)
+    oid = ShortUUIDField(unique=True, length=2, max_length=30, prefix="o", alphabet="1234567890") 
     order_status = models.CharField(choices=STATUS_CHOICE, max_length=30, default="processing")
+    
+    stripe_payment_intent = models.CharField(max_length=1000, blank=True, null=True)
     
     class Meta:
         verbose_name_plural = "Card Order"
@@ -170,8 +191,8 @@ class CartOrderItems(models.Model):
     item = models.CharField(max_length=127)
     image = models.CharField(max_length=127)
     quantity = models.IntegerField(default=0)
-    price = models.DecimalField(max_digits=999999999, decimal_places=2, default="1.99")
-    total = models.DecimalField(max_digits=999999999, decimal_places=2, default="1.99")
+    price = models.DecimalField(max_digits=12, decimal_places=2, default="1.99")
+    total = models.DecimalField(max_digits=12, decimal_places=2, default="1.99")
     
     class Meta:
         verbose_name_plural = "Card Order Items"
@@ -202,7 +223,7 @@ class ProductReview(models.Model):
     
 
 class Wishlist(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField(auto_now_add=True)
     
@@ -218,9 +239,21 @@ class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     address = models.CharField(max_length=127, null=True)
     phone_number = models.CharField(max_length=127, null=True)
+    country = models.CharField(max_length=63, blank=True, null=True)
     city = models.CharField(max_length=63, blank=True, null=True)
+    state = models.CharField(max_length=63, blank=True, null=True)
     post_code = models.IntegerField(blank=True, null=True)
-    status = models.BooleanField(default=False)
+    status = models.BooleanField(default=True)
     
     class Meta:
         verbose_name_plural = "Address"
+        
+    
+class Coupon(models.Model):
+    code = models.CharField(max_length=63)
+    discount = models.IntegerField(default=1)
+    active = models.BooleanField(default=True)
+    use_count = models.IntegerField()
+    
+    def __str__(self):
+        return self.code
