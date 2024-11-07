@@ -1,5 +1,5 @@
 from django.urls import path
-from store.views import index, category_list_view, product_list_view, product_detail_view, category_product_list_view, vendor_list_view, vendor_detail_view, ajax_add_review, search_view, product_filter_view, add_to_cart, cart_view, delete_from_cart, update_cart, checkout_view, wishlist_view, add_to_wishlist, remove_from_wishlist, save_checkout_info
+from store.views import index, category_list_view, product_list_view, product_detail_view, category_product_list_view, vendor_list_view, vendor_detail_view, ajax_add_review, search_view, product_filter_view, add_to_cart, cart_view, delete_from_cart, update_cart, checkout_view, wishlist_view, add_to_wishlist, remove_from_wishlist, save_checkout_info, delete_unpaid, edit_unpaid
 
 urlpatterns = [
     # Home page URL
@@ -33,13 +33,13 @@ urlpatterns = [
     path("delete-from-cart/", delete_from_cart, name="delete-from-cart"),
 
     # Update cart URL
-    path("update-cart", update_cart, name="update-cart"),
+    path("update-cart/", update_cart, name="update-cart"),
 
     # Cart URL
     path("view-cart/", cart_view, name="cart"),
     
     # Checkout URL
-    path("checkout/<oid>", checkout_view, name="checkout"),
+    path("checkout/<int:id>", checkout_view, name="checkout"),
     
     # Save Checkout Info URL
     path("save-checkout-info/", save_checkout_info, name="save-checkout-info"),
@@ -52,6 +52,12 @@ urlpatterns = [
 
     # Removing from Wishlist URL
     path("remove-from-wishlist/", remove_from_wishlist, name="remove-from-wishlist"),
+    
+    # Delete Unpaid Order URL
+    path("delete-unpaid/", delete_unpaid, name="delete-unpaid"),
+    
+    # Edit Unpaid Order URL
+    path("edit-unpaid/", edit_unpaid, name="edit-unpaid"),
 ]
 
 app_name = "store"

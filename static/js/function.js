@@ -1,67 +1,187 @@
 console.log('Working fine');
 
+document.addEventListener('DOMContentLoaded', () => {
+    const slider = document.querySelector('.price-slider input[type="range"]');
+    const sliderContainer = document.querySelector('.price-slider');
+    const increaseButton = document.querySelectorAll('#prc-increase');
+    const decreaseButton = document.querySelectorAll('#prc-decrease');
+    const priceInput = document.querySelectorAll('.prc-input');
+    const tabs = document.querySelectorAll('.navbar__link');
+    const contents = document.querySelectorAll('.tab-content');
+
+    increaseButton.forEach((increaseBtn, index) => {
+        increaseBtn.addEventListener('click', () => {
+            priceInput[index].stepUp();
+        });
+    });
+
+    decreaseButton.forEach((decreaseBtn, index) => {
+        decreaseBtn.addEventListener('click', () => {
+            priceInput[index].stepDown();
+        });
+    });
+
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            
+            tab.classList.add('active');
+            contents[index].classList.add('active');
+        });
+    })
+
+    const toggleSliderActive = (isActive) => {
+        sliderContainer.classList.toggle('price-slider-active', isActive);
+    };
+
+    if (slider) {
+        slider.addEventListener('mousedown', () => toggleSliderActive(true));
+        slider.addEventListener('mouseup', () => toggleSliderActive(false));
+        slider.addEventListener('mouseleave', () => toggleSliderActive(false));
+        slider.addEventListener('touchstart', () => toggleSliderActive(true));
+        slider.addEventListener('touchend', () => toggleSliderActive(false));
+    
+        slider.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+    }
+
+    const viewUnpaid = document.getElementById('show-unpaid');
+    const unpaidOrders = document.getElementsByClassName('unpaid-orders-container');
+
+    if (viewUnpaid) {
+        viewUnpaid.addEventListener('click', () => {
+            if (unpaidOrders[0].style.display === 'block') {
+                unpaidOrders[0].style.display = 'none';
+            } else {
+                unpaidOrders[0].style.display = 'block';
+            }
+        });
+    }
+
+    setTimeout(() => {
+        const messages = document.querySelectorAll('.msg');
+        messages.forEach(message => {
+            message.style.transition = 'opacity 0.5s ease';
+            message.style.opacity = '0';
+            setTimeout(() => message.remove(), 500);
+        });
+    }, 2000);
+    
+    const mainImage = document.getElementById('mainImage');
+    
+    function changeMainImage(clickedExtraImage) {
+        const newMainImageUrl = clickedExtraImage.src;
+    
+        if (mainImage.src === newMainImageUrl) return;
+        
+        mainImage.classList.add('fade-out');
+    
+         setTimeout(() => {
+            mainImage.src = newMainImageUrl;
+            mainImage.classList.remove('fade-out');
+        }, 300);
+    }
+    
+    let currentIndex = 0;
+    
+    function moveSlide(direction) {
+        const slides = document.querySelector('.slides');
+        const totalSlides = slides.children.length;
+        const maxIndex = totalSlides - 3; // максимальный индекс для показа 3 изображений
+    
+        currentIndex += direction;
+    
+        if (currentIndex < 0) {
+            currentIndex = maxIndex;
+        } else if (currentIndex > maxIndex) {
+            currentIndex = 0;
+        }
+    
+        slides.style.transform = `translateX(-${currentIndex * 75}%)`;
+    
+    }
+});
+
 const monthNames = ["Jan", "Feb", "Mar", "April",
     "May", "June", "July", "Aug", "Sept", "Oct",
     "Nov", "Dec"
 ];
 
-
-$("#reviewForm").submit(function(event){
-    event.preventDefault();
-
-    let dt = new Date();
-    let time = dt.getDay() + " " + monthNames[dt.getUTCMonth()] + ", " + dt.getFullYear()
-
-    $.ajax({
-        data: $(this).serialize(),
-        method: $(this).attr("method"),
-        url: $(this).attr("action"),
-        dataType: "json",
-        success: function(response){
-            console.log('Review saved to DB...');
-            
-            if (response.bool == true){
-                $("#review-response").html("Review added successfully");
-                $(".hide-review").hide();
-                $(".hide-review-form").hide();
-
-                let _html = '<!-- Single Review -->'
-                    _html += '<div class="single-review">'
-
-                    _html += '<!-- Review User Logo & Username -->'
-                    _html += '<div class="review-header">'
-                    _html += '<img src="" alt="User Avatar" class="review-avatar" id="review-avatar" />'
-                    _html += '<a href="#" class="review-username">'+ response.context.user +'</a>'
-                    _html += '</div>'
-
-                    _html += '<!-- Review Content -->'
-                    _html += '<div class="review-content">'
-                    _html += '<p>'+ response.context.review +'</p>'
-                    _html += '</div>'
-
-                    _html += '<!-- Review Date -->'
-                    _html += '<div class="review-date">'
-                    _html += '<span>'+ time +'</span>'
-                    _html += '</div>'
-
-                    _html += '<!-- Review Rating -->'
-                    _html += '<div class="review-rating">'
-
-                    for(let i = 1; i <= response.context.rating; i++){
-                        _html += '<span>★</span>';
-                    }
-
-                    _html += '</div>'
-                    _html += '</div>'
-
-                $(".reviews").prepend(_html); 
-            }
-        }
-    });
-});
-
 $(document).ready(function (){
-    $(".filter-checkbox, #price-filter-btn").on("click", function(){
+    $("#reviewForm").on("submit", function(event){
+        event.preventDefault();
+    
+        let dt = new Date();
+        let time = dt.getUTCDate() + " " + monthNames[dt.getUTCMonth()] + ", " + dt.getFullYear()
+    
+        $.ajax({
+            data: $(this).serialize(),
+            method: $(this).attr("method"),
+            url: $(this).attr("action"),
+            dataType: "json",
+            success: function(response){
+                console.log('Review saved to DB...');
+                
+                if (response.bool == true){
+                    $("#review-container").html('<div class="msg msg-success"><p>Review added successfully</p></div>');
+                    $(".hide-review").hide();
+                    $(".hide-review-form").hide();$(".rating-bg").val(response.avg_reviews.rating);
+                    $("#avg-rating-count").text(response.avg_reviews.rating.toFixed(1));
+                    $(".5star").val(response.rating_prc["5"]);
+                    $(".4star").val(response.rating_prc["4"]);
+                    $(".3star").val(response.rating_prc["3"]);
+                    $(".2star").val(response.rating_prc["2"]);
+                    $(".1star").val(response.rating_prc["1"]);
+
+                    setTimeout(() => {
+                        const messages = document.querySelectorAll('.msg');
+                        messages.forEach(message => {
+                            message.style.transition = 'opacity 0.5s ease';
+                            message.style.opacity = '0';
+                            setTimeout(() => message.remove(), 500);
+                        });
+                    }, 2000);
+    
+                    let _html = '<!-- Single Review -->'
+                        _html += '<div class="single-review">'
+    
+                        _html += '<!-- Review User Logo & Username -->'
+                        _html += '<div class="review-header">'
+                        _html += '<img src="'+ response.profile_image +'" alt="User Avatar" class="review-avatar" id="review-avatar" />'
+                        _html += '<p class="review-username">'+ response.context.user +'</p>'
+                        _html += '</div>'
+    
+                        _html += '<!-- Review Content -->'
+                        _html += '<div class="review-content">'
+                        _html += '<p>'+ response.context.review +'</p>'
+                        _html += '</div>'
+    
+                        _html += '<!-- Review Date -->'
+                        _html += '<div class="review-date">'
+                        _html += '<span>'+ time +'</span>'
+                        _html += '</div>'
+    
+                        _html += '<!-- Review Rating -->'
+                        _html += '<div class="review-rating">'
+    
+                        _html += '<div class="star-progress">'
+                        _html += '<progress class="rating-bg" value="'+ response.context.rating +'" max="5"></progress>'
+                        _html += '<svg><use xlink:href="#fivestars"/></svg>'
+                        _html += '</div>'
+    
+                        _html += '</div>'
+                        _html += '</div>'
+    
+                    $(".reviews").prepend(_html); 
+                }
+            }
+        });
+    })
+
+    $(".filter-cbx, #price-filter-btn").on("click", function(){
         console.log("A checkbox have been clicked");
 
         let filter_object = {}
@@ -72,7 +192,7 @@ $(document).ready(function (){
         filter_object.min_price = min_price;
         filter_object.max_price = max_price;
 
-        $(".filter-checkbox").each(function(){
+        $(".filter-cbx").each(function(){
             let filter_value = $(this).val()
             let filter_key = $(this).data("filter")
 
@@ -120,7 +240,7 @@ $(document).ready(function (){
         }
     })
 
-    $(".add-to-cart-btn").on("click", function(){
+    $(document).on("click", ".add-to-cart-btn", function(){
 
         let this_val = $(this)
         let index = this_val.attr("data-index")
@@ -164,7 +284,7 @@ $(document).ready(function (){
                 success: function(response){
                     this_val.html('<i class="fas fa-shopping-cart"></i><i class="fa-solid fa-check"></i>');
                     console.log("Added products to cart...");
-                    $(".cart-items-count").text(response.total_cart_items)
+                    $(".cart-count").text(response.total_cart_items)
                 },
                 error: function(){
                     console.log("Failed to add products to cart...")
@@ -192,7 +312,7 @@ $(document).ready(function (){
             },
             success: function(response){
                 this_val.show()
-                $(".cart-items-count").text(response.total_cart_items)
+                $(".cart-count").text(response.total_cart_items)
                 $("#cart-page").html(response.data)
             }
         })
@@ -220,12 +340,30 @@ $(document).ready(function (){
             },
             success: function(response){
                 this_val.show()
-                $(".cart-items-count").text(response.total_cart_items)
+                $(".cart-count").text(response.total_cart_items)
                 $("#cart-page").html(response.data)
             }
         })
 
     })
+
+    $(document).on("click", ".qty-increase", function() {
+        const productId = $(this).attr("data-product-id");
+        const quantityInput = $("#product-quantity-" + productId);
+
+        let currentValue = parseInt(quantityInput.val()) || 0;
+        quantityInput.val(currentValue + 1);
+    });
+
+    $(document).on("click", ".qty-decrease", function() {
+        const productId = $(this).attr("data-product-id");
+        const quantityInput = $("#product-quantity-" + productId);
+
+        let currentValue = parseInt(quantityInput.val()) || 0;
+        if (currentValue > 1) {
+            quantityInput.val(currentValue - 1);
+        }
+    });
 
     // Making Address Default
     $(document).on("click", ".make-default", function(){
@@ -245,12 +383,47 @@ $(document).ready(function (){
                 console.log("Address is now Default");
                 if (response.boolean == true){
 
-                    $(".check").hide()
+                    $(".default").hide()
                     $(".action_btn").show()
 
                     $(".check-" + id).show()
                     $(".button-" + id).hide()
                 }
+            }
+        })
+    })
+
+    $(document).on("click", ".remove-default", function(){
+        let id = $(this).attr("data-address-id")
+        let this_val = $(this)
+
+        var target = this_val.closest(".address-card")
+
+        console.log("ID:", id);
+        console.log("Element:", this_val)
+
+        function removeElement(target) {
+            target.animate({
+              opacity: "-=1"
+            }, 1000, function() {
+              target.remove();
+            });
+          }
+
+        $.ajax({
+            url: "/customer/remove-address",
+            data: {
+                "id": id,
+            },
+            dataType: "json",
+            beforeSend: function(){
+                console.log("removing address")
+            },
+            success: function(response){
+                removeElement(target);
+                setTimeout(function() {
+                    $("#address-container").html(response.data);
+                }, 1000);
             }
         })
     })
@@ -275,7 +448,7 @@ $(document).ready(function (){
             success: function(response){
                 if (response.bool == true) {
                     console.log("Added to wishlist")
-                    $(".wishlist-items-count").text(response.wishlist_count)
+                    $(".wishlist-count").text(response.wishlist_count)
                 }
             }
         })
@@ -299,7 +472,7 @@ $(document).ready(function (){
             },
             success: function(response){
                 $("#wishlist").html(response.data)
-                $(".wishlist-items-count").text(response.data.bool)
+                $(".wishlist-count").text(response.data.bool)
                 console.log(response.data.bool)
             }
         })
@@ -339,25 +512,3 @@ $(document).ready(function (){
         })
     })
 })
-
-function showTab(tabId) {
-    const tabs = document.querySelectorAll('.tab-content')
-
-    tabs.forEach(tab => {
-        tab.classList.remove('active');
-    });
-    document.getElementById(tabId).classList.add('active');
-}
-
-function initPayPalButton() {
-    paypal.Buttons({
-        style: {
-            shape: 'rect',
-            color: 'gold',
-            layout: 'vertical',
-            label: 'paypal',
-        },
-    }).render('#paypal-button-container');
-}
-
-initPayPalButton();

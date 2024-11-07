@@ -58,17 +58,18 @@ class Vendor(models.Model):
     title = models.CharField(max_length=63, default="Madarima")
     image = models.ImageField(upload_to=user_directory_path, default="vendor.jpg")
     cover_image = models.ImageField(upload_to=user_directory_path, default="cover_vendor.jpg")
-    description = RichTextUploadingField(null=True, blank=True, default="I am a Cool Vendor")
+    description = models.TextField(null=True, blank=True, default="I am a Cool Vendor")
     
     address = models.CharField(max_length=127, null=True)
     city = models.CharField(max_length=63, blank=True, null=True)
     post_code = models.IntegerField(blank=True, null=True)
     contact = models.CharField(max_length=63, default="+123 (456) 789")
+    rating = models.CharField(max_length=63, default="100")
     chat_resp_time = models.CharField(max_length=63, default="100")
     shipping_on_time = models.CharField(max_length=63, default="100")
     authentic_rating = models.CharField(max_length=63, default="100")
-    days_return = models.CharField(max_length=63, default="100")
-    warranty_period = models.CharField(max_length=63, default="100")
+    days_return = models.CharField(max_length=63, default="30")
+    warranty_period = models.CharField(max_length=63, default="1")
     
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
@@ -90,7 +91,7 @@ class Product(models.Model):
     
     title = models.CharField(max_length=63, default ="Volleyball")
     image = models.ImageField(upload_to=user_directory_path, default="product.jpg")
-    description = RichTextUploadingField(null=True, blank=True, default="This is the product")
+    description = models.TextField(null=True, blank=True, default="This is the product")
     
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name="category")
@@ -99,7 +100,6 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=12, decimal_places=2, default="1.99")
     old_price = models.DecimalField(max_digits=12, decimal_places=2, default="2.99")
     
-    specifications = RichTextUploadingField(null=True, blank=True)
     type = models.CharField(max_length=63, default ="Organic", null=True, blank=True)
     stock_count = models.CharField(max_length=63, default="12", null=True, blank=True)
     life = models.CharField(max_length=63, default="365 Days", null=True, blank=True)
@@ -122,7 +122,6 @@ class Product(models.Model):
     
     class Meta:
         verbose_name_plural = "Products"
-    
     
     def product_image(self):
         return mark_safe('<img src="%s" width="50" height="50" />' % (self.image.url))
@@ -172,7 +171,7 @@ class CartOrder(models.Model):
     
     paid_status = models.BooleanField(default=False)
     order_date = models.DateTimeField(auto_now_add=True)
-    oid = ShortUUIDField(unique=True, length=2, max_length=30, alphabet="1234567890") 
+    oid = ShortUUIDField(unique=True, max_length=5, alphabet="1234567890")
     order_status = models.CharField(choices=STATUS_CHOICE, max_length=30, default="processing")
     
     stripe_payment_intent = models.CharField(max_length=1000, blank=True, null=True)
@@ -187,6 +186,8 @@ class CartOrderItems(models.Model):
     order = models.ForeignKey(CartOrder, on_delete=models.CASCADE)
     
     invoice_number = models.CharField(max_length=127)
+    product_id = models.CharField(max_length=127) 
+    pid = models.CharField(max_length=127)
     product_status = models.CharField(max_length=127)
     item = models.CharField(max_length=127)
     image = models.CharField(max_length=127)
@@ -205,8 +206,8 @@ class CartOrderItems(models.Model):
 
 
 class ProductReview(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, related_name="reviews")
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True)
+    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, null=True, related_name="reviews")
     review = RichTextUploadingField()
     rating = models.IntegerField(choices=RATING, default=None)
     date = models.DateTimeField(auto_now_add=True)
@@ -214,9 +215,6 @@ class ProductReview(models.Model):
     class Meta:
         verbose_name_plural = "Product Reviews"
     
-    
-    def __str__(self):
-        return self.product.title
     
     def get_rating(self):
         return self.rating
@@ -243,7 +241,7 @@ class Address(models.Model):
     city = models.CharField(max_length=63, blank=True, null=True)
     state = models.CharField(max_length=63, blank=True, null=True)
     post_code = models.IntegerField(blank=True, null=True)
-    status = models.BooleanField(default=True)
+    status = models.BooleanField(default=False)
     
     class Meta:
         verbose_name_plural = "Address"
@@ -259,3 +257,8 @@ class Coupon(models.Model):
     
     def __str__(self):
         return self.code
+    
+    
+class ProductSpecifications(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True, related_name="product_specifications")
+    field = models.TextField()

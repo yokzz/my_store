@@ -1,45 +1,32 @@
-<div class="product-list">
-    {% for product in products %}
-    <!-- Product Item -->
-    <div class="product-item">
-        <!-- Product Discount -->
-        <div class="product-discount">
-            <span class="discount-badge">-{{ product.get_percentage|floatformat:0 }}%</span>
+{% for product in products %}
+<div class="product-item">
+    <div class="discount-badge">-{{ product.get_percentage|floatformat:0 }}%</div>
+    <!-- Product Image -->
+    <div class="images">
+        <img src="{{ product.image.url }}" alt="{{ product.title }}"/>
+    </div>
+    <!-- Product Properties -->
+    <div class="product">
+        <!-- Product Category -->
+        <div style="display: flex; flex-direction: column;">
+            <p>{{ product.category.title }} </p>
+            <h1><a href="{% url 'store:product-detail' product.pid %}">{{ product.title|truncatechars:30 }}</a></h1>
         </div>
-        <!-- Product Image -->
-        <div class="product-image">
-            <img src="{{ product.image.url }}" alt="{{ product.title }}" height="128" width="128" />
+        <div class="cnt-price">
+            <h2>$</h2><h2 style="margin-right: 7px;"class="current-price-{{ product.id }}">{{ product.price }}</h2>
+            <h2 class="old-price">${{ product.old_price }}</h2>
         </div>
-        <!-- Product Details -->
-        <div class="product-details">
-            <!-- Product Category -->
-            <div class="product-category">
-                <a href="{% url 'store:category-product-list' product.category.cid %}">{{ product.category.title }}</a>
-            </div>
-            <!-- Product Title -->
-            <div class="product-title">
-                <a href="{% url 'store:product-detail' product.pid %}">{{ product.title|truncatechars:50 }}</a>
-            </div>
-            <!-- Product Vendor -->
-            <div class="product-vendor">
-                By <a href="{% url 'store:vendor-detail' product.vendor.vid %}">{{ product.vendor.title }}</a>
-            </div>
-            <!-- Product Price -->
-            <div class="product-price">
-                <span>$</span><span id="current-price" class="current-price-{{ product.id }}">{{ product.price }}</span>
-                <span class="old-price">${{ product.old_price }}</span>
-            </div>
-        </div>
-        <!-- Add To Cart -->
-        <div>
+        <p class="description">{{ product.description|safe|truncatechars:75 }}</p>
+
+        <div class="buttons">
             <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ product.id }}"/>
             <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
             <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
             <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
             <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
-            <button type="submit" class="add-to-cart-btn" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add</button>
-            <button type="submit" class="add-to-wishlist" style="border: none; background: none;" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart"></i></button>
+            <button type="submit" class="add-to-cart-btn btn add" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart" style="margin-right: 10px;"></i>Add</button>
+            <button type="submit" class="add-to-wishlist btn like" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart wishlist-svg"></i></button>
         </div>
     </div>
-    {% endfor %}
 </div>
+{% endfor %}

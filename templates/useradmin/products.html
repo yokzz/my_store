@@ -1,0 +1,37 @@
+{% extends 'useradmin/base.html' %}
+{% block content %}
+<div class="products-container">
+    <h3>Products List</h3>
+    <small>Manage all your products from here</small>
+
+    <a href="{% url 'useradmin:add-product' %}">Create Product</a>
+
+    <table class="products-table">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Date Added</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in all_products %}
+            <tr>
+                <td><img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-image" /></td>
+                <td>{{ product.title }}</td>
+                <td>${{ product.price }}</td>
+                <td>{{ product.product_status }}</td>
+                <td>{{ product.date|date }}</td>
+                <td>
+                    <a href="{% url 'useradmin:edit-product' product.pid %}"class="edit-button"><i class="fa-solid fa-pen"></i> Edit</a>
+                    <a href="{% url 'useradmin:delete-product' product.pid %}" class="delete-button"><i class="fa-solid fa-trash"></i> Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

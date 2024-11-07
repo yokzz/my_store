@@ -1,53 +1,98 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<h1>Checkout</h1>
-<section class="cart-summary">
-    <div class="cart-items">
-        <div>
-            <h4>Your order #{{ order.oid }}</h4>
-        </div>
-        {% for order in order_items %}
-        <div class="cart-item">
-            <!-- Product Image -->
-            <div class="cart-item-image">
-                <img src="{{ order.image }}" alt="{{ product.title }}" />
+<div class="checkout-container">
+    <div class="checkout-items-container">
+        <h1>Checkout</h1>
+        <div class="checkout-items">
+            <div>
+                <h4>Your order #{{ order.id }}</h4>
             </div>
-            <!-- Product Details -->
-            <div class="cart-item-details">
-                <p class="cart-item-title">{{ order.item|truncatechars:50 }}</p>
-                <p class="cart-item-price">${{ order.price|floatformat:2 }}</p>
-                <input type="number" value="{{ order.quantity }}" min="1" id="product-quantity-{{ order_id }}" class="cart-item-quantity" readonly />
-                <p class="cart-item-subtotal">${{ order.total }}</p>
+            <div class="labels">
+                <table>
+                    <td class="product-td">Product</td>
+                    <td class="price-td">Price</td>
+                    <td class="quantity-td">Quantity</td>
+                    <td class="subtotal-td">Subtotal</td>
+                </table>
             </div>
+            {% for order in order_items %}
+            <div class="checkout-item">
+                <img src="{{ order.image }}" alt="{{ order.item }}" />
+                <p class="title">{{ order.item|truncatechars:50 }}</p>
+                <p class="price"><span>$</span><span class="current-price-{{ order_id }}">{{ order.price|floatformat:2 }}</span></p>
+                <div class="input-wrapper">
+                    <span class="input-prefix">x</span>
+                    <input type="number" value="{{ order.quantity }}" min="1" id="product-quantity-{{ order_id }}"/>
+                </div>
+                <p class="subtotal">${{ order.total }}</p>
+                {% comment %} <span class="featured-text">$</span><p class="price current-price-{{ wishlist.product.id }}">{{ wishlist.product.price|floatformat:2 }}</p> {% endcomment %}
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-</section>
-<!-- Order Summary -->
-<div>
-    <h3>Order Summary</h3>
-    <h5>Tax: 0.00$</h5>
-    <h5>Shipping: 0.00$</h5>
-    <h5>Discount: {{ order.saved }}$</h5>
-    <h5>Total: {{ order.price }}$</h5>
+    <div class="summary-container">
+        <div class="order-summary">
+            <h3>Order Summary</h3>
+            <div class="item">
+                <h5 class="left">Tax:</h5>
+                <h5 class="right">0.00$</h5>
+            </div>
+            <div class="item">
+                <h5 class="left">Shipping:</h5>
+                <h5 class="right">Free Shipping</h5>
+            </div>
+            <div class="item">
+                <h5 class="left">Discount:</h5>
+                <h5 class="right">{{ order.saved }}$</h5>
+            </div>
+            <div class="item">  
+                <h5 class="left">Total:</h5>
+                <h5 class="right">{{ order.price }}$</h5>
+            </div>
+            <a href="{% url 'store:cart' %}" class="btn btn-gbc">Go back to cart</a>
+        </div>
+        <!-- Coupon Code -->
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" name="code" placeholder="Enter Coupon Code..."/>
+            <button type="submit">Apply</button>
+        </form>
+        
+        <div id="paypal-button-container"></div>
+    </div>
 </div>
-<!-- Coupon Code -->
-<div>
-    <form method="POST">
-        {% csrf_token %}
-        <input type="text" name="code" placeholder="Enter Coupon Code..."/>
-        <button type="submit">Apply</button>
-    </form>
-</div>
-{% if cart_data %}
-<form action="{% url 'payment:create_payment' %}" method="POST">
-    {% csrf_token %}
-    <button type="submit">Pay with PayPal</button>
-</form>
-{% endif %}
 
-<a href="{% url 'store:cart' %}" class="signin-button">Go back to cart</a>
+<script>
+    paypal.Buttons({
+        createOrder: function(data, actions){
+            return actions.order.create({
+                purchase_units: [
+                    {
+                        amount: {
+                            value: "{{ order.price }}",
+                        },
+                    },
+                ],
+            });
+        },
 
+        onApprove: function(data, actions){
+            return actions.order.capture().then(function (Detail) {
+                console.log(Detail);
+                if(Detail.status === "COMPLETED"){
+                    window.location.href = `/payment/completed/{{order.id}}/?status=${Detail.status}`
+                }
+            });
+        },
+
+        style: {
+            layout: 'vertical',
+            color: 'gold',
+            shape: 'rect',
+            label: 'paypal',
+            height: 45,
+        },
+    }).render("#paypal-button-container")
+</script>
 
 {% endblock %}

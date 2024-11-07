@@ -1,80 +1,95 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- Filter -->
-<div class="filter-container">
-    <!-- Category Filter -->
-    {% for category in categories %}
-    <div class="category-filter">
-        <input type="checkbox" class="filter-checkbox" data-filter="category" value="{{ category.cid }}" id="categoryCheckbox"/>
-        <a href="{% url 'store:category-product-list' category.cid %}">
-            <img src="{{ category.image.url }}" height="32" width="32"/>{{ category.title }}
-        </a>
-    </div>
-    {% endfor %}
-    <!-- Price Filter -->
-    <div id="slider-range" class="price-slider">
-        <input type="range" name="range" id="range" value="{{ min_price.price__min|floatformat:2 }}" min="{{ min_price.price__min }}" max="{{ max_price.price__max }}" style="width: 100%;" oninput="max_price.value=this.value"/>
-    </div>
-    <!-- Min & Max Price-->
-    <div class="price-display">
-        <div>From: ${{ min_price.price__min|floatformat:2 }}</div>
-        <div>To: ${{ max_price.price__max|floatformat:2 }}</div>
-    </div>
-    <div>
-        <input type="number" id="max_price" value="{{ min_price.price__min|floatformat:2 }}" min="{{ min_price.price__min|floatformat:2 }}" max="{{ max_price.price__max|floatformat:2 }}" style="width: 100%;" onkeyup="range.value=this.value"/>
-    </div>
-    <div>
-        <button id="price-filter-btn" type="button" style="width: 100%;">Filter</button>
-    </div>
-</div>
-
-<div class="product-container">
-    <div class="product-list" id="filtered-product">
-        {% for product in products %}
-        <!-- Product Item -->
-        <div class="product-item">
-            <!-- Product Discount -->
-            <div class="product-discount">
-                <span class="discount-badge">-{{ product.get_percentage|floatformat:0 }}%</span>
+<div class="layout">
+    <!-- Filter -->
+    <div class="leftbar">
+        <div class="filter">
+            <!-- Category Filter -->
+            {% for category in categories %}
+            <div class="checkbox-wrapper">
+                <a href="{% url 'store:category-product-list' category.cid %}">{{ category.title }}</a>
+                <input type="checkbox" id="category-cbx-{{ category.cid }}" class="filter-cbx" data-filter="category" value="{{ category.cid }}"/>
+                <label for="category-cbx-{{ category.cid }}" class="toggle"><span></span></label>
             </div>
-            <!-- Product Image -->
-            <div class="product-image">
-                <img src="{{ product.image.url }}" alt="{{ product.title }}" height="128" width="128" />
+            {% endfor %}
+            <!-- Price Filter -->
+            <div class="price-slider">
+                <input type="range" name="range" id="range" value="{{ min_price.price__min|floatformat:2 }}" min="{{ min_price.price__min }}" max="{{ max_price.price__max }}" style="width: 100%;" oninput="max_price.value=this.value"/>
             </div>
-            <!-- Product Details -->
-            <div class="product-details">
-                <!-- Product Category -->
-                <div class="product-category">
-                    <a href="{% url 'store:category-product-list' product.category.cid %}">{{ product.category.title }}</a>
-                </div>
-                <!-- Product Title -->
-                <div class="product-title">
-                    <a href="{% url 'store:product-detail' product.pid %}">{{ product.title|truncatechars:50 }}</a>
-                </div>
-                <!-- Product Vendor -->
-                <div class="product-vendor">
-                    By <a href="{% url 'store:vendor-detail' product.vendor.vid %}">{{ product.vendor.title }}</a>
-                </div>
-                <!-- Product Price -->
-                <div class="product-price">
-                    <span>$</span><span id="current-price" class="current-price-{{ product.id }}">{{ product.price }}</span>
-                    <span class="old-price">${{ product.old_price }}</span>
+            <!-- Min & Max Price-->
+            <div class="price-display">
+                <div>From: <span class="featured-text">${{ min_price.price__min|floatformat:2 }}</span></div>
+                <div>To: <span class="featured-text">${{ max_price.price__max|floatformat:2 }}</span></div>
+            </div>
+            <div class="price-webkit-change">
+                <input type="number" class="prc-input" id="max_price" value="{{ min_price.price__min|floatformat:2 }}" min="{{ min_price.price__min|floatformat:2 }}" max="{{ max_price.price__max|floatformat:2 }}" style="width: 100%;" onkeyup="range.value=this.value"/>
+                <div class="webkit-btn">
+                    <button id="prc-decrease">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="16" width="16">
+                            <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/>
+                        </svg>
+                    </button>
+                    <button id="prc-increase">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="16" width="16">
+                            <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
-            <!-- Add To Cart -->
-            <div>
-                <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ product.id }}"/>
-                <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
-                <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
-                <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
-                <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
-                <button type="submit" class="add-to-cart-btn" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add</button>
-                <button type="submit" class="add-to-wishlist" style="border: none; background: none;" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart"></i></button>
-            </div>
+            <button id="price-filter-btn" type="button" class="btn btn-filter">Filter</button>
         </div>
-        {% endfor %}
+    </div>
+
+    <div class="rightbar">
+        <div class="product-list" id="filtered-product">
+            {% for product in products %}
+            <!-- Product Item -->
+            <div class="product-item">
+                <div class="discount-badge">-{{ product.get_percentage|floatformat:0 }}%</div>
+                <!-- Product Image -->
+                <div class="images" id="slider">
+                    <div class="slides">
+                        <div class="slide active">
+                            <img src="{{ product.image.url }}" alt="{{ product.title }}"/>
+                        </div>
+                        {% if product_images %}
+                            {% for image in product_images %}
+                                <div class="slide">
+                                    <img src="{{ image.images.url }}" alt="{{ product.title }}" width="150"/>
+                                </div>
+                                <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
+                                <button class="next" onclick="changeSlide(1)">&#10095;</button>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- Product Properties -->
+                <div class="product">
+                    <!-- Product Category -->
+                    <div style="display: flex; flex-direction: column;">
+                        <p>{{ product.category.title }} </p>
+                        <h1><a href="{% url 'store:product-detail' product.pid %}">{{ product.title|truncatechars:30 }}</a></h1>
+                    </div>
+                    <div class="cnt-price">
+                        <h2>$</h2><h2 style="margin-right: 7px;"class="current-price-{{ product.id }}">{{ product.price }}</h2>
+                        <h2 class="old-price">${{ product.old_price }}</h2>
+                    </div>
+                    <p class="description">{{ product.description|safe|truncatechars:75 }}</p>
+
+                    <div class="buttons">
+                        <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ product.id }}"/>
+                        <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
+                        <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
+                        <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
+                        <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
+                        <button type="submit" class="add-to-cart-btn btn add" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart" style="margin-right: 10px;"></i>Add</button>
+                        <button type="submit" class="add-to-wishlist btn like" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart wishlist-svg"></i></button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
-
 {% endblock content %}

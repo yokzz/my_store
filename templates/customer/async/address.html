@@ -1,0 +1,45 @@
+{% for address in address_obj %}
+{% if address.status == True %}
+<div class="address-card">
+    <h4>{{ address.city }}</h4>
+    <div class="address-body">
+        <div class="address-box">
+            <li>{{ address.address }}</li>
+            <span data-address-id="{{ address.id }}" class="default check-{{ address.id }}">
+                <span>Default</span>
+            </span>
+        </div>
+        <div class="other-info">
+            <li class="main-info">{{ address.state }}, {{ address.city }}, {{ address.post_code }}, {{ address.country }}</li>
+            <li class="phone-number">{{ address.phone_number }}</li>
+        </div>
+    </div>
+
+    <div class="btns">
+        <button data-address-id="{{ address.id }}" style="display: none;" class="make-default button-{{ address.id }} action_btn" >Set as default</button>
+        <button data-address-id="{{ address.id }}" class="remove-default button-{{ address.id }}">Remove</button>
+    </div>
+</div>
+{% else %}
+<div class="address-card">
+    <h4>{{ address.city }}</h4>
+    <div class="address-body">
+        <div class="address-box">
+            <li>{{ address.address }}</li>
+            <span data-address-id="{{ address.id }}" class="default check-{{ address.id }}" style="display: none;">
+                <span>Default</span>
+            </span>
+        </div>
+        <div class="other-info">
+            <li>{{ address.state }}, {{ address.city }}, {{ address.post_code }}, {{ address.country }}</li>
+            <li class="phone-number">{{ address.phone_number }}</li>
+        </div>
+    </div>
+
+    <div class="btns">
+        <button data-address-id="{{ address.id }}" class="make-default button-{{ address.id }} action_btn" >Set as default</button>
+        <button data-address-id="{{ address.id }}" class="remove-default button-{{ address.id }}">Remove</button>
+    </div>
+</div>
+{% endif %}
+{% endfor %}

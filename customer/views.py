@@ -1,13 +1,16 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import check_password
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models.functions import ExtractMonth
 from django.db.models import Count
+from django.core import serializers
+from django.template.loader import render_to_string
 
 from store.models import CartOrder, CartOrderItems, Address
 from customer.models import ContactUs
-from userauths.models import Profile
+from userauths.models import Profile, User
 from userauths.forms import ProfileForm
 
 import calendar
@@ -41,7 +44,7 @@ def dashboard(request):
             post_code = post_code,
         )
         
-        messages.success = (request, "Address Added Successfully")
+        messages.success(request, "Address Added Successfully")
         
         
         
@@ -58,8 +61,8 @@ def dashboard(request):
     
     return render(request, 'customer/dashboard.html', context)
 
-def order_detail(request, oid):
-    order = CartOrder.objects.get(oid=oid)
+def order_detail(request, id):
+    order = CartOrder.objects.get(id=id)
     order_items = CartOrderItems.objects.filter(order=order)
     
     context = {
@@ -74,6 +77,23 @@ def make_address_default(request):
     Address.objects.update(status=False)
     Address.objects.filter(id=id).update(status=True)
     return JsonResponse({"boolean": True})
+
+def remove_address(request):
+    id = request.GET['id']
+    Address.objects.filter(id=id).delete()
+    
+    addresses = Address.objects.filter(user=request.user)
+    
+    context = {
+        "bool": True,
+        "address_obj": addresses
+    }
+    
+    addresses_json = serializers.serialize('json', addresses)
+    
+    data = render_to_string("customer/async/address.html", context)
+    
+    return JsonResponse({"data": data, "addresses": addresses_json})
 
 def contactus(request):
     
@@ -99,6 +119,7 @@ def ajax_contactus(request):
     return JsonResponse({"context": context})
 
 def profile_update(request):
+    user = request.user
     profile = Profile.objects.get(user=request.user)
     form = ProfileForm()
     
@@ -111,11 +132,11 @@ def profile_update(request):
         total_orders.append(order['count'])
     
     if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            profile_save = form.save(commit=False)
-            profile_save.user = request.user
-            profile_save.save()
+        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if profile_form.is_valid():
+            user.email = profile_form.cleaned_data.get('email')
+            user.save()
+            profile_form.save()
             messages.success(request, "Profile Edited Successfully.")
             return redirect("customer:dashboard")
     else:
@@ -129,3 +150,33 @@ def profile_update(request):
     }
     
     return render(request, "customer/profile-edit.html", context)
+
+@login_required
+def change_password(request):
+    user = request.user
+    
+    if request.method == "POST":
+        old_password = request.POST["old_password"]
+        new_password = request.POST["new_password"]
+        confirm_new_password = request.POST["confirm_new_password"]
+        
+        if new_password != confirm_new_password:
+            messages.error(request, "Passwords do not match")
+            return redirect("customer:change-password")
+        
+        elif old_password == new_password:
+            messages.error(request, "Old and new passwords match")
+            return redirect("customer:change-password")
+            
+        else:
+            if check_password(old_password, user.password):
+                user.set_password(new_password)
+                user.save()
+                messages.success(request, "Password has been changed successfully")
+                return redirect("customer:change-password")
+            
+            else:
+                messages.error(request, "Old password is incorrect")
+                return redirect("customer:change-password")
+        
+    return render(request, "customer/change-password.html")

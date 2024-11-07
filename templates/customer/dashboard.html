@@ -1,162 +1,331 @@
-{% extends 'base.html' %}
-{% block content %}
+{% load static %}
 
-<h2>Hello, {{ request.user.username|title }}</h2>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Poppins&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AXG2FqENmi4prLZbBTPuPy8kpKVdS8ex7jO7XYhdfUpOP-M25dSGmgP01KVttVLGM8vWIZOqv_ZcVuO5&currency=USD"></script>
+</head>
 
-<div class="tabs">
-    <div class="tab" onclick="showTab('tab1')">Dashboard</div>
-    <div class="tab" onclick="showTab('tab2')">Orders</div>
-    <div class="tab" onclick="showTab('tab3')">Shipping address</div>
-    <div class="tab" onclick="showTab('tab4')">Profile</div>
-    
-</div>
+<body id="dashboard">
+<nav class="navbar">
+    <ul class="navbar__menu">
+        <li class="navbar__item">
+            <label for="tab-1" class="navbar__link"><i class="fa-solid fa-bars"></i><span>Dashboard</span></label>
+        </li>
+        <li class="navbar__item">
+            <label for="tab-2" class="navbar__link"><i class="fa-solid fa-truck"></i><span>Orders</span></label>        
+        </li>
+        <li class="navbar__item">
+            <label for="tab-3" class="navbar__link"><i class="fa-solid fa-location-dot"></i><span>Shipping Address</span></label>        
+        </li>
+        <li class="navbar__item">
+            <label for="tab-4" class="navbar__link"><i class="fa-solid fa-user"></i><span>Profile</span></label>
+        </li>
+        <li class="navbar__item">
+            <a href="{% url 'store:product-list' %}" class="navbar__link"><i class="fa-solid fa-arrow-rotate-left"></i><span>Back to Shop</span></a> 
+        </li>      
+    </ul>
+</nav>
 
 <!-- Dashboard Tab -->
-<div id="tab1" class="tab-content active">
-    <div>
-        <canvas style="height: 50px; "id="myChart"></canvas>
-      </div>
-</div>
-
-<!-- Orders Tab -->
-<div id="tab2" class="tab-content">
-    <h3>Orders: </h3>
-    <div class="invoice-box">
-        <table>
-            <tr class="heading">
-                <td>Order</td>
-                <td style="text-align: left;">Total</td>
-                <td>Order Status</td>
-                <td>Paid Status</td>
-                <td>Order Date</td>
-                <td>Check Order</td>
-            </tr>
-            
-            {% for order in order_list %}
-            <tr class="item">
-                <td>#{{ order.oid }}</td>
-                <td class="product-price" style="text-align: left;">${{ order.price }}</td>
-                <td>{{ order.order_status }}</td>
-                <td>{{ order.paid_status }}</td>
-                <td>{{ order.order_date }}</td>
-                <td><a href="{% url 'customer:order-detail' order.oid %}">View</a></td>
-            </tr>
-            {% endfor %}
-        </table>
+<div class="tabs-content">
+    <div id="content-1" class="tab-content active">
+        <div class="stats">
+            <canvas id="myChart" ></canvas>
+        </div>
     </div>
-</div>
 
-<!-- Shipping Address Tab -->
-<div id="tab3" class="tab-content">
-    <div>
+    <!-- Orders Tab -->
+    <div id="content-2" class="tab-content">
+        <div class="orders-box">
+            <table>
+                <thead>
+                    <tr class="heading">
+                        <th class="hashtag"></th>
+                        <th>Order</th>
+                        <th>Total</th>
+                        <th>Order Status</th>
+                        <th>Paid Status</th>
+                        <th>Order Date</th>
+                        <th class="check-order"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in order_list %}
+                    {% if order.paid_status == True %}
+                    <tr class="item">
+                        <td class="hashtag">#</td>
+                        <td>{{ order.id }}</td>
+                        <td class="product-price">${{ order.price }}</td>
+                        {% if order.order_status == "processing" %}
+                        <td><span class="btn-small status">
+                            <svg class="processing-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <path d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/>
+                              </svg>
+                            Processing</span></td>
+                        {% elif order.order_status == "shipped" %}
+                        <td><span class="btn-small status">
+                            <svg class="shipped-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                <path d="M112 0C85.5 0 64 21.5 64 48l0 48L16 96c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0 208 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 160l-16 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l16 0 176 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 224l-48 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0 144 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 288l0 128c0 53 43 96 96 96s96-43 96-96l128 0c0 53 43 96 96 96s96-43 96-96l32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-64 0-32 0-18.7c0-17-6.7-33.3-18.7-45.3L512 114.7c-12-12-28.3-18.7-45.3-18.7L416 96l0-48c0-26.5-21.5-48-48-48L112 0zM544 237.3l0 18.7-128 0 0-96 50.7 0L544 237.3zM160 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96zm272 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0z"/>
+                            </svg>
+                            Shipped</span></td>
+                        {% else %}
+                        <td><span class="btn-small status">
+                            <svg class="delivered-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                <path d="M58.9 42.1c3-6.1 9.6-9.6 16.3-8.7L320 64 564.8 33.4c6.7-.8 13.3 2.7 16.3 8.7l41.7 83.4c9 17.9-.6 39.6-19.8 45.1L439.6 217.3c-13.9 4-28.8-1.9-36.2-14.3L320 64 236.6 203c-7.4 12.4-22.3 18.3-36.2 14.3L37.1 170.6c-19.3-5.5-28.8-27.2-19.8-45.1L58.9 42.1zM321.1 128l54.9 91.4c14.9 24.8 44.6 36.6 72.5 28.6L576 211.6l0 167c0 22-15 41.2-36.4 46.6l-204.1 51c-10.2 2.6-20.9 2.6-31 0l-204.1-51C79 419.7 64 400.5 64 378.5l0-167L191.6 248c27.8 8 57.6-3.8 72.5-28.6L318.9 128l2.2 0z"/>
+                            </svg>
+                            Delivered</span></td>
+                        {% endif %}
+                        <td><span class="btn-small paid">
+                            <svg class="check-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/>
+                            </svg>
+                            Paid
+                            </span>
+                        </td>
+                        <td>{{ order.order_date }}</td>
+                        <td class="view"><a class="btn-small btn-view" href="{% url 'customer:order-detail' order.id %}">
+                            <svg class="view-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/>
+                            </svg>
+                            View</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr class="item">
+                        <td class="hashtag">#</td>
+                        <td>{{ order.id }}</td>
+                        <td class="product-price">${{ order.price }}</td>
+                        {% if order.order_status == "processing" %}
+                        <td><span class="btn-small status">
+                            <svg class="processing-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <path d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/>
+                              </svg>
+                            Processing</span></td>
+                        {% elif order.order_status == "shipped" %}
+                        <td><span class="btn-small status">
+                            <svg class="shipped-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                <path d="M112 0C85.5 0 64 21.5 64 48l0 48L16 96c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0 208 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 160l-16 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l16 0 176 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 224l-48 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0 144 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 288l0 128c0 53 43 96 96 96s96-43 96-96l128 0c0 53 43 96 96 96s96-43 96-96l32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-64 0-32 0-18.7c0-17-6.7-33.3-18.7-45.3L512 114.7c-12-12-28.3-18.7-45.3-18.7L416 96l0-48c0-26.5-21.5-48-48-48L112 0zM544 237.3l0 18.7-128 0 0-96 50.7 0L544 237.3zM160 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96zm272 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0z"/>
+                            </svg>
+                            Shipped</span></td>
+                        {% else %}
+                        <td><span class="btn-small status">
+                            <svg class="delivered-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                <path d="M58.9 42.1c3-6.1 9.6-9.6 16.3-8.7L320 64 564.8 33.4c6.7-.8 13.3 2.7 16.3 8.7l41.7 83.4c9 17.9-.6 39.6-19.8 45.1L439.6 217.3c-13.9 4-28.8-1.9-36.2-14.3L320 64 236.6 203c-7.4 12.4-22.3 18.3-36.2 14.3L37.1 170.6c-19.3-5.5-28.8-27.2-19.8-45.1L58.9 42.1zM321.1 128l54.9 91.4c14.9 24.8 44.6 36.6 72.5 28.6L576 211.6l0 167c0 22-15 41.2-36.4 46.6l-204.1 51c-10.2 2.6-20.9 2.6-31 0l-204.1-51C79 419.7 64 400.5 64 378.5l0-167L191.6 248c27.8 8 57.6-3.8 72.5-28.6L318.9 128l2.2 0z"/>
+                            </svg>
+                            Delivered</span></td>
+                        {% endif %}
+                        <td><span class="btn-small unpaid">
+                            <svg class="xmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+                            </svg>
+                            Unpaid
+                            </span>
+                        </td>
+                        <td>{{ order.order_date }}</td>
+                        <td class="view">
+                            <a class="btn-small btn-view" href="{% url 'store:checkout' order.id %}">
+                                <svg class="pay-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                    <path d="M64 32C28.7 32 0 60.7 0 96l0 32 576 0 0-32c0-35.3-28.7-64-64-64L64 32zM576 224L0 224 0 416c0 35.3 28.7 64 64 64l448 0c35.3 0 64-28.7 64-64l0-192zM112 352l64 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-64 0c-8.8 0-16-7.2-16-16s7.2-16 16-16zm112 16c0-8.8 7.2-16 16-16l128 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16z"/>
+                                </svg>
+                                Pay
+                            </a>
+                            <a class="btn-small btn-view" href="{% url 'customer:order-detail' order.id %}">
+                                <svg class="view-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                    <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/>
+                                </svg>
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Shipping Address Tab -->
+    <div id="content-3" class="tab-content">
         <form method="POST">
             {% csrf_token %}
-            <h4>Add Shipping Address</h4>
-            <div class="form-group">
-                <label for="address">Address</label>
-                <input type="text" id="address" name="address" required placeholder="Main Street, 123" class="form-input">
+            <div class="one-input">
+                <div class="input-container">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" name="address" required placeholder="Main Street, 123" class="form-input">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="text" id="phone" name="phone" required placeholder="+1 (123) 456-7890" class="form-input">
+            <div class="two-inputs">
+                <div class="input-container">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="+1 (123) 456-7890" class="form-input">
+                </div>
+                <div class="input-container">
+                    <label for="country">Country</label>
+                    <input type="text" id="country" name="country" required placeholder="United States" class="form-input">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="country">Country</label>
-                <input type="text" id="country" name="country" value="{{ active_address.country }}" required placeholder="United States" class="form-input">
+            <div class="three-inputs">
+                <div class="input-container">
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="city" required placeholder="New York" class="form-input">
+                </div>
+                <div class="input-container">
+                    <label for="state">State</label>
+                    <input type="text" id="state" name="state" required placeholder="New York State" class="form-input">
+                </div>
+                <div class="input-container">
+                    <label for="post_code">Post Code</label>
+                    <input type="text" id="post_code" name="post_code" required placeholder="10118" class="form-input">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="city">City</label>
-                <input type="text" id="city" name="city" value="{{ active_address.city }}" required placeholder="New York" class="form-input">
-            </div>
-            <div class="form-group">
-                <label for="state">State</label>
-                <input type="text" id="state" name="state" value="{{ active_address.state }}" required placeholder="New York State" class="form-input">
-            </div>
-            <div class="form-group">
-                <label for="post_code">Post Code</label>
-                <input type="text" id="post_code" name="post_code" required placeholder="10118" class="form-input">
-            </div>
-            <button type="submit" class="">Submit</button>
+            <button type="submit" class="btn btn-beige">Submit</button>
         </form>
-    </div>
-    
-    <div>
-        {% for address in address_obj %}
-        <h4>Address {{ forloop.counter }}</h4>
-        <address>
-            Address: {{ address.address }}
-            <br>
-            Phone number: {{ address.phone_number }}
-            <br>
-            Country: {{ address.country }}
-            <br>
-            City: {{ address.country }}
-            <br>
-            State: {{ address.country }}
-            <br>
-            Post Code: {{ address.post_code }}
+        
+        <div class="address-container" id="address-container">
+            {% for address in address_obj %}
             {% if address.status == True %}
-            <i data-address-id="{{ address.id }}" class="fa-solid fa-check check-{{ address.id }} check"></i>
-            <button data-address-id="{{ address.id }}" class="make-default button-{{ address.id }} action_btn" style="display: none;">Make Default</button>
+            <div class="address-card">
+                <h4>{{ address.city }}</h4>
+                <div class="address-body">
+                    <div class="address-box">
+                        <li>{{ address.address }}</li>
+                        <span data-address-id="{{ address.id }}" class="default check-{{ address.id }}">
+                            <span>Default</span>
+                        </span>
+                    </div>
+                    <div class="other-info">
+                        <li class="main-info">{{ address.state }}, {{ address.city }}, {{ address.post_code }}, {{ address.country }}</li>
+                        <li class="phone-number">{{ address.phone_number }}</li>
+                    </div>
+                </div>
+
+                <div class="btns">
+                    <button data-address-id="{{ address.id }}" style="display: none;" class="make-default button-{{ address.id }} action_btn" >Set as default</button>
+                    <button data-address-id="{{ address.id }}" class="remove-default button-{{ address.id }}">Remove</button>
+                </div>
+            </div>
             {% else %}
-            <i data-address-id="{{ address.id }}" style="display: none;" class="fa-solid fa-check check-{{ address.id }} check"></i>
-            <button data-address-id="{{ address.id }}" class="make-default button-{{ address.id }} action_btn">Make Default</button>
+            <div class="address-card">
+                <h4>{{ address.city }}</h4>
+                <div class="address-body">
+                    <div class="address-box">
+                        <li>{{ address.address }}</li>
+                        <span data-address-id="{{ address.id }}" class="default check-{{ address.id }}" style="display: none;">
+                            <span>Default</span>
+                        </span>
+                    </div>
+                    <div class="other-info">
+                        <li>{{ address.state }}, {{ address.city }}, {{ address.post_code }}, {{ address.country }}</li>
+                        <li class="phone-number">{{ address.phone_number }}</li>
+                    </div>
+                </div>
+
+                <div class="btns">
+                    <button data-address-id="{{ address.id }}" class="make-default button-{{ address.id }} action_btn" >Set as default</button>
+                    <button data-address-id="{{ address.id }}" class="remove-default button-{{ address.id }}">Remove</button>
+                </div>
+            </div>
             {% endif %}
             {% endfor %}
-        </address>
+        </div>
+    </div>
+
+    <!-- Profile Tab -->
+    <div id="content-4" class="tab-content">
+        <div class="profile">
+            <div class="avatar">
+                <div class="profile-image">
+                    <img src="{{ profile.image.url }}" />
+                </div>
+                <div class="name">{{ profile.first_name }} {{ profile.last_name }}</div>
+            </div>
+
+            <div class="other-info">
+                <div class="column">
+                    <div class="label">
+                        Email
+                    </div>
+                    <div class="field">
+                        {{ profile.email }}
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="label">
+                        Phone
+                    </div>
+                    <div class="field">
+                        {{ profile.phone_number }}
+                    </div>
+                </div>
+                <div class="column textarea">
+                    <div class="text-label">
+                        Bio
+                    </div>
+                    <div class="text-field">
+                        {{ profile.bio }}
+                    </div>
+                </div>
+                {% comment %} {% if profile.verified == True %}
+                <div>Verified <span class="verified"><i class="fa-solid fa-check"></i></span></div>
+                {% else %}
+                <div>Unverified <span class="unverified"><i class="fa-solid fa-xmark"></i></span></div>
+                {% endif %} {% endcomment %}
+                <div class="btns">
+                    <a class="btn-small btn-beige" href="{% url 'customer:profile-edit' %}">Edit Profile</a>
+                    <a class="btn-small btn-beige" href="{% url 'customer:change-password' %}">Change Password</a>
+                    <a class="btn-small btn-beige" href="{% url 'userauths:logout' %}">Logout</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-<!-- Profile Tab -->
-<div id="tab4" class="tab-content">
-    <h3>My Profile</h3>
-    <hr>
-    <!-- Customer Image -->
-    <div>
-        <img style="border-radius: 50%;" src="{{ profile.image.url }}" height="64" width="64"/>
-    </div>
-    <!-- Customer Full Name-->
-    <div>{{ profile.first_name }} {{ profile.last_name }}</div>
-    <!-- Customer Email -->
-    <div>{{ profile.email }}</div>
-    <!-- Customer Bio -->
-    <div>{{ profile.bio }}</div>
-    <!-- Customer Phone Number -->
-    <div>{{ profile.phone_number }}</div>
-    <!-- Verified Status -->
-    {% if profile.verified == True %}
-    <div>Verified <span style="color: green"><i class="fa-solid fa-check"></i></span></div>
-    {% else %}
-    <div>Unverified <span style="color: red"><i class="fa-solid fa-xmark"></i></span></div>
-    {% endif %}
-    <!-- Edit Profile Button -->
-    <a href="{% url 'customer:profile-edit' %}">Edit Profile</a>
-</div>
-
 
 <script>
     const ctx = document.getElementById('myChart');
-    const labels = {{ month|safe }}
+    const labels = {{ month|safe }};
+
+    Chart.defaults.font.size = 14;
+    Chart.defaults.font.family = "Poppins";
     
     new Chart(ctx, {
         type: 'bar',
         data: {
-        labels: labels,
-        datasets: [{
-            label: 'Orders',
-            backgroundColor: 'gray',
-            borderColor: 'gray',
-            data: {{ total_orders|safe }},
-            borderWidth: 1
-        }]
-        },
-        options: {
-        scales: {
-            y: {
-            beginAtZero: true
-            }
+            labels: labels,
+            datasets: [{
+                label: 'Orders',
+                backgroundColor: '#B8A99A',
+                borderColor: '#B8A99A',
+                data: {{ total_orders|safe }},
+                borderWidth: 1
+            }]
         }
-        }
-    });
+    })
 </script>
-{% endblock content %}
+<script src="{% static 'js/function.js' %}"></script>
+
+<div class="container" id="dashboard-messages">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="msg msg-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}
+
+    {% endblock content %}
+</div>
+</body>

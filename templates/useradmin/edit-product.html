@@ -1,0 +1,64 @@
+{% extends 'useradmin/base.html' %}
+{% block content %}
+
+<h2>Edit Product</h2>
+<div class="product-container">
+    <form id="add-product-form" enctype="multipart/form-data" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="title">Title:</label>
+            {{ form.title }}
+        </div>
+
+        <div class="form-group">
+            <label for="image">Image:</label>
+            {{ form.image }}
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price:</label>
+            {{ form.price }}
+        </div>
+
+        <div class="form-group">
+            <label for="old_price">Price without discount:</label>
+            {{ form.old_price }}
+        </div>
+
+        <div class="form-group">
+            <label for="currency">Currency:</label>
+            <select>
+                <option>USD</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            {{ form.description }}
+        </div>
+
+        <div class="form-group">
+            <label for="specifications">Specifications:</label>
+            {{ form.specifications }}
+        </div>
+
+        <div class="form-group">
+            <label for="stock_count">Product in Stock:</label>
+            {{ form.stock_count }}
+        </div>
+
+        <div class="form-group">
+            <label for="product_status">Product Status:</label>
+            {{ form.product_status }}
+        </div>
+
+        <div class="form-group">
+            <label for="in_stock">In Stock:</label>
+            {{ form.in_stock }}
+        </div>
+
+        <button type="submit" class="submit-btn">Submit</button>
+    </form>
+</div>
+
+{% endblock content %}

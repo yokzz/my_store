@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2>Order #{{ order.oid }}</h2>
+<h2>Order #{{ order.id }}</h2>
 <h3>Status: {{ order.order_status|title }}</h3>
-<h3>Contains: </h3>
+<h3>Contains:</h3>
 <div class="invoice-box">
     <table>
         <tr class="heading">
             <td>Title</td>
-            <td style="text-align: left;">Image</td>
+            <td>Image</td>
             <td>Quantity</td>
             <td>Price</td>
         </tr>
@@ -16,12 +16,15 @@
         {% for order in order_items %}
         <tr class="item">
             <td>{{ order.item }}</td>
-            <td style="text-align: left;"><img src="{{ order.image }}" height="32" width="32"/></td>
+            <td><img src="{{ order.image }}" height="32" width="32" alt="Order Item Image"/></td>
             <td>{{ order.quantity }}</td>
             <td>{{ order.total }}</td>
         </tr>
         {% endfor %}
     </table>
+    {% if order.saved > 0.00 %}
+    <h5>Discount: -{{ order.saved }}%</h5>
+    {% endif %}
 </div>
 
 {% endblock content %}

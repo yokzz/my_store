@@ -24,6 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-hd==_b*nj$ni8p#i40eu2t#@n2+lqb-7hm0b-gkkz^a)91(ccm'
 
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
     # Third party
     'ckeditor',
     'paypal.standard.ipn',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [
@@ -148,7 +151,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 JAZZMIN_SETTINGS = {
     "site_header": "Madarima",
     "site_brand": "Madarima",
-    "site_logo": "img/admin-logo.jpg",
+    "site_logo": "img/madarima..png",
     "copyright" : "madarima.com ",
 }
 

@@ -12,7 +12,6 @@ class UserRegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email']
-        
 
 class ProfileForm(forms.ModelForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "John"}))

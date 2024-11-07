@@ -1,12 +1,14 @@
 from django.contrib import admin
-from store.models import Product, Category, Vendor, CartOrder, CartOrderItems, Wishlist, Tags, ProductImages, ProductReview, Address, Coupon
+from store.models import Product, Category, Vendor, CartOrder, CartOrderItems, Wishlist, Tags, ProductImages, ProductReview, Address, Coupon, ProductSpecifications
 
 class ProductImagesAdmin(admin.TabularInline):
     model = ProductImages
-    
+
+class ProductSpecificationsAdmin(admin.TabularInline):
+    model = ProductSpecifications
 
 class ProductAdmin(admin.ModelAdmin):
-    inlines = [ProductImagesAdmin]
+    inlines = [ProductImagesAdmin, ProductSpecificationsAdmin]
     list_display = ['user', 'title', 'product_image', 'price', 'category', 'vendor', 'featured', 'pid', 'product_status']
     
 
@@ -20,7 +22,7 @@ class VendorAdmin(admin.ModelAdmin):
     
 class CartOrderAdmin(admin.ModelAdmin):
     list_editable = ['paid_status']
-    list_display = ['user', 'price', 'paid_status', 'order_date', 'order_status', 'oid']
+    list_display = ['user', 'price', 'paid_status', 'order_date', 'order_status', 'id']
     
 
 class CartOrderItemsAdmin(admin.ModelAdmin):

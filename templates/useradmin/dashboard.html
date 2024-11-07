@@ -1,0 +1,58 @@
+{% extends 'useradmin/base.html' %}
+{% block content %}
+<div class="dashboard-container">
+    <h3>Dashboard</h3>
+    
+    <div class="stats-container">
+        <div class="stat-item">
+            <small>Revenue</small>
+            {{ revenue.price|floatformat:2 }}<i class="fa-solid fa-dollar-sign"></i>
+        </div>
+        <div class="stat-item">
+            <small>Orders</small>
+            {{ total_orders_count.count }}<i class="fa-solid fa-truck"></i>
+        </div>
+        <div class="stat-item">
+            <small>Products</small>
+            {{ all_products.count }}<i class="fa-solid fa-bag-shopping"></i>
+        </div>
+        <div class="stat-item">
+            <small>Monthly Earning</small>
+            {{ monthly_revenue.price|floatformat:2 }}<i class="fa-solid fa-money-bill"></i>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="invoice-box">
+        <table>
+            <thead>
+                <tr class="heading">
+                    <th>Order ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Order Date</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in latest_orders %}
+                <tr class="item">
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.first_name }} {{ order.last_name }}</td>
+                    <td>{{ order.email }}</td>
+                    <td>{{ order.phone_number }}</td>
+                    <td>{{ order.order_date }}</td>
+                    <td class="product-price">${{ order.price }}</td>
+                    <td>{{ order.order_status }}</td>
+                    <td><a href="{% url 'useradmin:order-detail' order.id %}" class="view-order">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}

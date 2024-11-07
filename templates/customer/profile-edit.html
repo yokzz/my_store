@@ -2,9 +2,8 @@
 {% block content %}
 
 <div class="tabs">
-    <div class="tab"><a style="color: black;" href="{% url 'customer:dashboard' %}">Back to Dashboard</a></div>
+    <div class="tab"><a class="tab-link" href="{% url 'customer:dashboard' %}">Back to Dashboard</a></div>
     <div class="tab" id="tab5" style="display: none;" onclick="showTab('tab5')">Profile</div>
-    
 </div>
 
 <!-- Profile Tab -->
@@ -12,74 +11,64 @@
     <h3>My Profile</h3>
     <hr>
     {% if form.errors %}
-    <div>
+    <div class="error-message">
         <strong>{{ form.errors }}</strong>
     </div>
     {% endif %}
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        <!-- Current Customer Image -->
         <div class="form-group">
-            <img style="border-radius: 50%;" src="{{ profile.image.url }}" height="64" width="64"/>
+            <img src="{{ profile.image.url }}" height="64" width="64" alt="Profile Image"/>
         </div>
-        <!-- Update Customer First Name -->
         <div class="form-group">
             {{ form.first_name }}
         </div>
-        <!-- Update Customer Last Name -->
         <div class="form-group">            
             {{ form.last_name }}
         </div>
-        <!-- Update Customer Email -->        
         <div class="form-group">        
             {{ form.email }}
         </div>        
-        <!-- Update Customer Biography -->
         <div class="form-group">        
             {{ form.bio }}
         </div>        
-        <!-- Update Customer Phone Number -->
         <div class="form-group">        
             {{ form.phone_number }}
         </div>
-        <!-- Update Customer Image -->        
         <div class="form-group">        
             {{ form.image }}
         </div>
-        <!-- Verified Status -->
         {% if profile.verified == True %}
-            <div>Verified <span style="color: green"><i class="fa-solid fa-check"></i></span></div>
+            <div>Verified <span class="verified"><i class="fa-solid fa-check"></i></span></div>
         {% else %}
-            <div>Unverified <span style="color: red"><i class="fa-solid fa-xmark"></i></span></div>
+            <div>Unverified <span class="unverified"><i class="fa-solid fa-xmark"></i></span></div>
         {% endif %}
-        <!-- Edit Profile Button -->
-        <button type="submit">Save changes</button>        
+        <button type="submit" class="btn">Save Changes</button>        
     </form>
 </div>
 
-
 <script>
     const ctx = document.getElementById('myChart');
-    const labels = {{ month|safe }}
+    const labels = {{ month|safe }};
     
     new Chart(ctx, {
         type: 'bar',
         data: {
-        labels: labels,
-        datasets: [{
-            label: 'Orders',
-            backgroundColor: 'gray',
-            borderColor: 'gray',
-            data: {{ total_orders|safe }},
-            borderWidth: 1
-        }]
+            labels: labels,
+            datasets: [{
+                label: 'Orders',
+                backgroundColor: 'gray',
+                borderColor: 'gray',
+                data: {{ total_orders|safe }},
+                borderWidth: 1
+            }]
         },
         options: {
-        scales: {
-            y: {
-            beginAtZero: true
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
-        }
         }
     });
 </script>
