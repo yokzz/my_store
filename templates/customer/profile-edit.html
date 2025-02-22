@@ -1,51 +1,121 @@
-{% extends "base.html" %}
-{% block content %}
+{% load static %}
 
-<div class="tabs">
-    <div class="tab"><a class="tab-link" href="{% url 'customer:dashboard' %}">Back to Dashboard</a></div>
-    <div class="tab" id="tab5" style="display: none;" onclick="showTab('tab5')">Profile</div>
-</div>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Poppins&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AXG2FqENmi4prLZbBTPuPy8kpKVdS8ex7jO7XYhdfUpOP-M25dSGmgP01KVttVLGM8vWIZOqv_ZcVuO5&currency=USD"></script>
+</head>
 
-<!-- Profile Tab -->
-<div id="tab5" class="tab-content active">
-    <h3>My Profile</h3>
-    <hr>
-    {% if form.errors %}
-    <div class="error-message">
-        <strong>{{ form.errors }}</strong>
-    </div>
-    {% endif %}
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="form-group">
-            <img src="{{ profile.image.url }}" height="64" width="64" alt="Profile Image"/>
+<body>
+    <header>
+        <nav class="navbar">
+            <ul class="navbar__menu">
+                <li class="navbar__item">
+                    <label class="navbar___link navbar__close"><i class="fa-solid fa-arrow-left"></i><span>Hide</span></label>
+                </li>
+                <li class="navbar__item">
+                    <label for="tab-1" class="navbar__link"><i class="fa-solid fa-pen-to-square"></i><span>Edit Profile</span></label>
+                </li>
+                <li class="navbar__item">
+                    <a href="{% url 'customer:change-password' %}" class="navbar__link"><i class="fa-solid fa-key"></i><span>Change Password</span></a>
+                </li>
+                <li class="navbar__item">
+                    <a href="{% url 'customer:dashboard' %}" class="navbar__link"><i class="fa-solid fa-arrow-rotate-left"></i><span>Back to Dashboard</span></a> 
+                </li>      
+            </ul>
+        </nav>
+
+        <div class="navbar__open">
+            <i class="fa-solid fa-arrow-right"></i>
         </div>
-        <div class="form-group">
-            {{ form.first_name }}
-        </div>
-        <div class="form-group">            
-            {{ form.last_name }}
-        </div>
-        <div class="form-group">        
-            {{ form.email }}
-        </div>        
-        <div class="form-group">        
-            {{ form.bio }}
-        </div>        
-        <div class="form-group">        
-            {{ form.phone_number }}
-        </div>
-        <div class="form-group">        
-            {{ form.image }}
-        </div>
-        {% if profile.verified == True %}
-            <div>Verified <span class="verified"><i class="fa-solid fa-check"></i></span></div>
-        {% else %}
-            <div>Unverified <span class="unverified"><i class="fa-solid fa-xmark"></i></span></div>
+    </header>
+
+    <div class="message-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="msg msg-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endif %}
-        <button type="submit" class="btn">Save Changes</button>        
-    </form>
-</div>
+    
+        {% if form.errors %}
+        <div class="msg msg-error">
+            {{ form.errors }}
+        </div>
+        {% endif %}
+    </div>
+    <div class="body-tabs">
+        <div class="profile-edit">
+            <!-- Profile Tab -->
+            <div id="content-1" class="tab-content active">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="avatar">
+                        <div class="profile-image">
+                            <img src="{{ profile.image.url }}" />
+                        </div>
+                        <div class="input-container" id="img">
+                            <label for="currently">Currently</label>
+                            <input type="text" id="currently" name="currently" value="{{ profile.image }}" readonly/>
+                            <label class="change" for="image">Change</label>
+                            <input type="file" id="image" name="image" class="form-input"/>
+                        </div>  
+                        <div class="name">{{ profile.first_name }} {{ profile.last_name }}
+                            {% if profile.verified == True %}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/>
+                            </svg>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form">
+                        <div class="two-inputs">
+                            <div class="input-container">
+                                <label for="first_name">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="input-container">
+                                <label for="last_name">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                        <div class="two-inputs">
+                            <div class="input-container">
+                                <label for="email">Email</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="input-container">
+                                <label for="phone">Phone Number</label>
+                                {{ form.phone_number }}
+                            </div>       
+                        </div>
+                        <div class="one-input">
+                            <div class="input-container">
+                                <label for="bio">Bio</label>
+                                {{ form.bio }}
+                            </div>    
+                        </div>
+                        
+                        <button type="submit" class="btn btn-beige">Save Changes</button> 
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/function.js' %}"></script>
+</body>
 
 <script>
     const ctx = document.getElementById('myChart');
@@ -72,5 +142,3 @@
         }
     });
 </script>
-
-{% endblock content %}

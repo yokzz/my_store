@@ -1,10 +1,45 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div>
-    <h1>Payment Completed</h1>
-    <h2>Your order has been successfully placed. Order Id #{{ order.id }}</h2>
-    <p><a href="{% url 'customer:contact-us' %}">Contact us</a>if you have any issue or question</p>
+<div class="payment-container">
+  
+    <div class="card">
+      
+      <span class="success"><i class="fa-solid fa-check"></i></span>
+      
+      <h1 class="card-msg">Payment Complete</h1>
+      <h2 class="submsg">Your order has been successfully placed.</h2>
+      
+      <div class="body">
+        
+        <div class="user-info">
+          <img src="{{ order.user.profile.image.url }}" class="avatar">
+          <div class="recipient-info">
+            <p class="recipient">{{ order.first_name }} {{ order.last_name }}</p>
+            <p class="email">{{ order.email }}</p>
+          </div>
+        </div>
+        
+        <h1 class="price"><span>$</span>{{ order.price|floatformat:2 }}</h1>
+        
+        {% comment %} <p class="method">Payment method</p>
+        <div class="payment">
+          <img src="https://seeklogo.com/images/V/VISA-logo-F3440F512B-seeklogo.com.png" class="credit-card">
+          <div class="card-details">
+            <p class="card-type">Credit / debit card</p>
+            <p class="card-number">Visa ending in **89</p>          
+          </div>
+        </div> {% endcomment %}
+        
+      </div>
+      
+      <div class="tags">
+          <span class="tag"><a href="{% url 'customer:contact-us' %}">Contact us</a></span>
+          <span class="tag">#{{ order.id }}</span>        
+      </div>
+      
+    </div>
+    
 </div>
 
 {% endblock content %}

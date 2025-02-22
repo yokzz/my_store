@@ -13,6 +13,9 @@ from customer.models import ContactUs
 from userauths.models import Profile, User
 from userauths.forms import ProfileForm
 
+from allauth.socialaccount.models import SocialAccount
+
+
 import calendar
 
 @login_required
@@ -35,6 +38,8 @@ def dashboard(request):
         phone_number = request.POST["phone"]
         city = request.POST["city"]
         post_code = request.POST["post_code"]
+        country = request.POST["country"]
+        state = request.POST["state"]
         
         new_address = Address.objects.create(
             user=request.user,
@@ -42,6 +47,8 @@ def dashboard(request):
             phone_number = phone_number,
             city = city,
             post_code = post_code,
+            country = country,
+            state = state,
         )
         
         messages.success(request, "Address Added Successfully")
@@ -64,10 +71,15 @@ def dashboard(request):
 def order_detail(request, id):
     order = CartOrder.objects.get(id=id)
     order_items = CartOrderItems.objects.filter(order=order)
+    status_order = ["processing", "ontheway", "shipped", "delivered"]
+    current_status = order.order_status
+
+    active_statuses = status_order[:status_order.index(current_status) + 1]
     
     context = {
         "order": order,
         "order_items": order_items,
+        'active_statuses': active_statuses,
     }
     
     return render(request, "customer/order-detail.html", context)
@@ -134,11 +146,15 @@ def profile_update(request):
     if request.method == "POST":
         profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
         if profile_form.is_valid():
-            user.email = profile_form.cleaned_data.get('email')
-            user.save()
-            profile_form.save()
-            messages.success(request, "Profile Edited Successfully.")
-            return redirect("customer:dashboard")
+            try: 
+                user.email = profile_form.cleaned_data.get('email')
+                user.save()
+                profile_form.save()
+                messages.success(request, "Profile Edited Successfully.")
+                return redirect("customer:dashboard")
+            except: 
+                messages.error(request, "Email already exists.")
+                return redirect("customer:profile-edit")
     else:
         form = ProfileForm(instance=profile)
     

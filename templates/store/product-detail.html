@@ -25,7 +25,7 @@
                 <img id="mainImage" src="{{ product.image.url }}" alt="{{ product.title }}" height="256" width="256" />
             </div>
         
-            {% if product_images|length > 3 %}
+            {% if product_images|length >= 3 %}
             <div class="extra-images">
                 <button class="prev" onclick="moveSlide(-1)">&#10094;</button>
                 <div class="slides">
@@ -105,14 +105,14 @@
                             <path d="M376.6 84.5c11.3-13.6 9.5-33.8-4.1-45.1s-33.8-9.5-45.1 4.1L192 206 56.6 43.5C45.3 29.9 25.1 28.1 11.5 39.4S-3.9 70.9 7.4 84.5L150.3 256 7.4 427.5c-11.3 13.6-9.5 33.8 4.1 45.1s33.8 9.5 45.1-4.1L192 306 327.4 468.5c11.3 13.6 31.5 15.4 45.1 4.1s15.4-31.5 4.1-45.1L233.7 256 376.6 84.5z"/>
                         </svg>
                     </span> {% endcomment %}
-                    <input type="number" value="1" min="1" id="product-quantity-{{ product_id }}"/>
+                    <input type="number" value="1" min="1" id="product-quantity-{{ product.id }}" class="product-quantity-{{ product.id }}"/>
                     <div class="webkit-btn">
-                        <button class="qty-decrease" data-product-id="{{ product_id }}">
+                        <button class="qty-decrease" data-product-id="{{ product.id }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="12" width="12">
                                 <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/>
                             </svg>
                         </button>
-                        <button class="qty-increase" data-product-id="{{ product_id }}">
+                        <button class="qty-increase" data-product-id="{{ product.id }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="12" width="12">
                                 <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
                             </svg>
@@ -144,7 +144,7 @@
         </div>
     <br>
 </div>
-    <div class="info-boxes">
+    {% comment %} <div class="info-boxes">
         <!-- Info Box 1: Address & Return/Warranty -->
         <div class="info-box-1">
             <div class="user-address">
@@ -226,7 +226,7 @@
                 Ship on Time
             </span>
         </div>
-    </div>
+    </div> {% endcomment %}
 </div>
 
 <div class="info">
@@ -257,93 +257,99 @@
                 
             <!-- Content-3 -->
             <div class="item" id="content-3">
-                <!-- Reviews -->
-                <div class="reviews-container">
-                    <div class="reviews">
-                        {% for review in reviews %}
-                        <!-- Single Review -->
-                        <div class="single-review">
-                            <!-- Review User Logo & Username -->
-                            <div class="review-header">
-                                <img src="{{ review.user.profile.image.url }}" alt="User Avatar" class="review-avatar" id="review-avatar"/>
-                                <p class="review-username">{{ review.user.username }}</p>
-                            </div>
-                            <!-- Review Content -->
-                            <div class="review-content">
-                                <p>{{ review.review|safe }}</p>
-                            </div>
-                            <!-- Review Date -->
-                            <div class="review-date">
-                                <span>{{ review.date|date:"d M, Y" }}</span>
-                            </div>
-                            <!-- Review Rating -->
-                            <div class="review-rating">
-                                <div class="star-progress">
-                                    <progress class="rating-bg" value="{{ review.rating }}" max="5"></progress>
-                                    <svg><use xlink:href="#fivestars"/></svg>
+                <div class="align-box">
+                    <div class="left-section">
+                        <div class="align-container">
+                            {% if request.user.is_authenticated %}
+                            {% if make_review == True %}
+                            <div class="review-container">
+                                <h3 style="display:none;" class="review-title hide-review">Add a review</h3>
+                                <div class="messages">
+                                    <strong id="review-response"></strong>
                                 </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-
-                        <!-- Review form -->
-                        {% if request.user.is_authenticated %}
-                        {% if make_review == True %}
-                        <div class="review-container">
-                            <h3 style="display:none;" class="review-title hide-review">Add a review</h3>
-                            <div class="messages">
-                                <strong id="review-response"></strong>
-                            </div>
-                            <form method="post" action="{% url 'store:ajax-add-review' product.pid %}" class="review-form hide-review-form" id="reviewForm">
-                                {% csrf_token %}
-                                <div class="input-container">
-                                    <label for="review">Review</label>
-                                    <textarea id="review" name="review" value="" required placeholder="Tell us about your experience with the product" class="form-input"></textarea>
-                                </div>
-                                <div class="rating-input">
-                                    <div class="rating-box">
-                                      <span class="text">Rate us</span>
-                                      <div class="rating-svgs">
-                                            <input type="radio" id="rating-5" name="rating" value="5"/>
-                                            <label for="rating-5" class="rating-5">
-                                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                                  <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
-                                                </svg>
-                                            </label>
-                                            <input type="radio" id="rating-4" name="rating" value="4"/>
-                                            <label for="rating-4" class="rating-4">
-                                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                                  <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
-                                                </svg>
-                                            </label>
-                                            <input type="radio" id="rating-3" name="rating" value="3"/>
-                                            <label for="rating-3" class="rating-3">
-                                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                                  <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
-                                                </svg>
-                                            </label>
-                                            <input type="radio" id="rating-2" name="rating" value="2"/>
-                                            <label for="rating-2" class="rating-2">
+                                <form method="post" action="{% url 'store:ajax-add-review' product.pid %}" class="review-form hide-review-form" id="reviewForm">
+                                    {% csrf_token %}
+                                    <div class="input-container">
+                                        <label for="review">Review</label>
+                                        <textarea id="review" name="review" value="" required placeholder="Tell us about your experience with the product" class="form-input"></textarea>
+                                    </div>
+                                    <div class="rating-input">
+                                        <div class="rating-box">
+                                        <span class="text">Rate us</span>
+                                        <div class="rating-svgs">
+                                                <input type="radio" id="rating-5" name="rating" value="5"/>
+                                                <label for="rating-5" class="rating-5">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                     <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
-                                                </svg>
-                                            </label>
-                                            <input type="radio" id="rating-1" name="rating" value="1"/>
-                                            <label for="rating-1" class="rating-1">
-                                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                                  <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
-                                                </svg>
-                                            </label>
+                                                    </svg>
+                                                </label>
+                                                <input type="radio" id="rating-4" name="rating" value="4"/>
+                                                <label for="rating-4" class="rating-4">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
+                                                    </svg>
+                                                </label>
+                                                <input type="radio" id="rating-3" name="rating" value="3"/>
+                                                <label for="rating-3" class="rating-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
+                                                    </svg>
+                                                </label>
+                                                <input type="radio" id="rating-2" name="rating" value="2"/>
+                                                <label for="rating-2" class="rating-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
+                                                    </svg>
+                                                </label>
+                                                <input type="radio" id="rating-1" name="rating" value="1"/>
+                                                <label for="rating-1" class="rating-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
+                                                    </svg>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn submit-btn">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Reviews -->
+                        <div class="reviews-container">
+                            <div class="reviews">
+                                <!-- Review form -->
+                                {% for review in reviews %}
+                                <!-- Single Review -->
+                                <div class="single-review">
+                                    <!-- Review User Logo & Username -->
+                                    <div class="review-header">
+                                        <img src="{{ review.user.profile.image.url }}" alt="User Avatar" class="review-avatar" id="review-avatar"/>
+                                        <p class="review-username">{{ review.user.username }}</p>
+                                    </div>
+                                    <!-- Review Content -->
+                                    <div class="review-content">
+                                        <p>{{ review.review|safe }}</p>
+                                    </div>
+                                    <!-- Review Date -->
+                                    <div class="review-date">
+                                        <span>{{ review.date|date:"d M, Y" }}</span>
+                                    </div>
+                                    <!-- Review Rating -->
+                                    <div class="review-rating">
+                                        <div class="star-progress">
+                                            <progress class="rating-bg" value="{{ review.rating }}" max="5"></progress>
+                                            <svg><use xlink:href="#fivestars"/></svg>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn submit-btn">Submit</button>
                                 </div>
-                            </form>
-                        </div>
-                        {% endif %}
-                        {% endif %}
+                                {% endfor %}
                     </div>
-
+                    </div>
+                </div>
+                <div class="right-section">
                     <div class="review-statistics"> 
                         <div class="average-rating">
                             {% if average_rating.rating %}
@@ -385,7 +391,7 @@
                             </div>
                         </div>
                     </div>
-            </div>
+                </div>
             </div>
             </div>
             </div>
@@ -397,34 +403,36 @@
     <!-- Related Products -->
     <div class="related-products">
         <h2>Related Products</h2>
-        {% for related_product in products %}
-        <div class="related-product">
-            <!-- Product Image -->
-            <div class="product-image">
-                <img src="{{ related_product.image.url }}" alt="{{ related_product.title }}" height="128" width="128" />
+        <div class="related-products-container">
+            {% for related_product in products %}
+            <div class="related-product">
+                <!-- Product Image -->
+                <div class="product-image">
+                    <img src="{{ related_product.image.url }}" alt="{{ related_product.title }}" height="128" width="128" />
+                </div>
+                <!-- Product Title -->
+                <div class="product-title">
+                    <a href="{% url 'store:product-detail' related_product.pid %}">{{ related_product.title|truncatechars:50 }}</a>
+                </div>
+                <!-- Product Price -->
+                <div class="product-price">
+                    <span class="price">${{ related_product.price }}</span>
+                    <br>
+                    <span class="old-price">${{ related_product.old_price }}</span>
+                </div>
+                <!-- Add to Cart -->
+                <div class="cart">
+                    <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
+                    <button type="submit" class="btn add-to-cart-btn" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add</button>
+                    <button type="submit" class="btn add-to-wishlist" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart wishlist-svg"></i></button>
+                </div>
             </div>
-            <!-- Product Title -->
-            <div class="product-title">
-                <a href="{% url 'store:product-detail' related_product.pid %}">{{ related_product.title|truncatechars:50 }}</a>
-            </div>
-            <!-- Product Price -->
-            <div class="product-price">
-                <span class="price">${{ related_product.price }}</span>
-                <br>
-                <span class="old-price">${{ related_product.old_price }}</span>
-            </div>
-            <!-- Add to Cart -->
-            <div class="cart">
-                <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ product.id }}"/>
-                <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
-                <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
-                <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
-                <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
-                <button type="submit" class="btn add-to-cart-btn" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add</button>
-                <button type="submit" class="btn add-to-wishlist" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart wishlist-svg"></i></button>
-            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 
     <br>
@@ -449,6 +457,37 @@
         </div>
         {% endfor %}
     </div> {% endcomment %}
+    <div class="cart-sidebar hidden" id="cart-sidebar">
+        <div class="cart-sidebar-header">
+            <h3>Cart</h3>
+            <button id="closeCart" class="close-button"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="cart-sidebar-items">
+            {% for product_id, product in cart_data.items %}
+            <div class="cart-sidebar-item">
+                <img src="{{ product.image }}" alt="product.title" />
+                <div class="cart-sidebar-item-details">
+                    <div class="line">
+                        <h3>{{ product.title }}</h3>
+                        <p class="price"><span>$</span><span>{{ product.price }}</span></p>
+                    </div>
+                    <div class="btns">
+                        <div class="quantity-controls">
+                            <button class="decrease" data-product="{{ product_id }}">-</button>
+                            <span class="quantity" id="product-quantity-{{ product_id }}">{{ product.quantity }}</span>
+                            <button class="increase" data-product="{{ product_id }}">+</button>
+                        </div>
+                        <button class="delete-side-product" data-product="{{ product_id }}"><i class="fa-solid fa-trash-can"></i></button>
+                        <button class="update-side-product" data-product="{{ product_id }}"><i class="fa-solid fa-arrows-rotate"></i></button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="cart-sidebar-footer">
+            <a class="btn-beige" href="{% url 'store:cart' %}">Go to cart</a>
+        </div>
+    </div>
 </div>
 
 <script>

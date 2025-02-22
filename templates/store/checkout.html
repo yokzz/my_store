@@ -18,11 +18,15 @@
             {% for order in order_items %}
             <div class="checkout-item">
                 <img src="{{ order.image }}" alt="{{ order.item }}" />
-                <p class="title">{{ order.item|truncatechars:50 }}</p>
-                <p class="price"><span>$</span><span class="current-price-{{ order_id }}">{{ order.price|floatformat:2 }}</span></p>
-                <div class="input-wrapper">
-                    <span class="input-prefix">x</span>
-                    <input type="number" value="{{ order.quantity }}" min="1" id="product-quantity-{{ order_id }}"/>
+                <div class="title-price">
+                    <p class="title">{{ order.item|truncatechars:50 }}</p>
+                    <div class="price-container">
+                        <p class="price"><span>$</span><span class="current-price-{{ order_id }}">{{ order.price|floatformat:2 }}</span></p>
+                        <div class="input-wrapper">
+                            <span class="input-prefix">x</span>
+                            <span class="input-qty" id="product-quantity-{{ order_id }}">{{ order.quantity }}</span>
+                        </div>
+                    </div>
                 </div>
                 <p class="subtotal">${{ order.total }}</p>
                 {% comment %} <span class="featured-text">$</span><p class="price current-price-{{ wishlist.product.id }}">{{ wishlist.product.price|floatformat:2 }}</p> {% endcomment %}
@@ -78,10 +82,20 @@
 
         onApprove: function(data, actions){
             return actions.order.capture().then(function (Detail) {
-                console.log(Detail);
+                console.log(Detail.method);
                 if(Detail.status === "COMPLETED"){
                     window.location.href = `/payment/completed/{{order.id}}/?status=${Detail.status}`
                 }
+
+                return fetch("/route/to/paypal/capture", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        fundingSource: fundingSource, 
+                    }),
+                });
             });
         },
 

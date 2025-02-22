@@ -2,9 +2,14 @@
 {% load static %}
 
 {% block content %}
-    <div class="heading-section">
-        <h1>Welcome to my store</h1>
+    <div class="banner">
+        <div class="overlay">
+        <h1>WHERE DREAMS COME TRUE</h1>
+        <p>Shop Here.</p>
+        <a href="{% url 'store:product-list' %}">SHOP NOW</a>
+        </div>
     </div>
+    <h1 class="home-text">FEATURED PRODUCTS</h1>
     <div class="product-container">
         {% for product in products %}
         <div class="product-item">
@@ -39,4 +44,49 @@
         </div>
         {% endfor %}
     </div>
+    {% if cart_data %}
+        <div class="cart-sidebar hidden" id="cart-sidebar">
+            <div class="cart-sidebar-header">
+                <h3>Cart</h3>
+                <button id="closeCart" class="close-button"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="cart-sidebar-items">
+                {% for product_id, product in cart_data.items %}
+                <div class="cart-sidebar-item">
+                    <img src="{{ product.image }}" alt="product.title" />
+                    <div class="cart-sidebar-item-details">
+                        <div class="line">
+                            <h3>{{ product.title }}</h3>
+                            <p class="price"><span>$</span><span>{{ product.price }}</span></p>
+                        </div>
+                        <div class="btns">
+                            <div class="quantity-controls">
+                                <button class="decrease" data-product="{{ product_id }}">-</button>
+                                <span class="quantity" id="product-quantity-{{ product_id }}">{{ product.quantity }}</span>
+                                <button class="increase" data-product="{{ product_id }}">+</button>
+                            </div>
+                            <button class="delete-side-product" data-product="{{ product_id }}"><i class="fa-solid fa-trash-can"></i></button>
+                            <button class="update-side-product" data-product="{{ product_id }}"><i class="fa-solid fa-arrows-rotate"></i></button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="cart-sidebar-footer">
+                <a class="btn-beige" href="{% url 'store:cart' %}">Go to cart</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="cart-sidebar hidden" id="cart-sidebar">
+            <div class="cart-sidebar-header">
+                <h3>Cart</h3>
+                <button id="closeCart" class="close-button"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="cart-sidebar-items">
+            </div>
+            <div class="cart-sidebar-footer">
+                <a class="btn-beige" href="{% url 'store:cart' %}">Go to cart</a>
+            </div>
+        </div>
+    {% endif %}
 {% endblock content %}

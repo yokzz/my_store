@@ -8,6 +8,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const priceInput = document.querySelectorAll('.prc-input');
     const tabs = document.querySelectorAll('.navbar__link');
     const contents = document.querySelectorAll('.tab-content');
+    const forms = document.querySelector(".forms");
+
+    setTimeout(() => {
+        const messages = document.querySelectorAll('.msg');
+        messages.forEach(message => {
+            message.style.transition = 'opacity 0.5s ease';
+            message.style.opacity = '0';
+            setTimeout(() => message.remove(), 500);
+        });
+    }, 2000);
+
+    const toggleSliderActive = (isActive) => {
+        sliderContainer.classList.toggle('price-slider-active', isActive);
+    };
+
+    pwShowHide = document.querySelectorAll(".eye-icon");
+    pwShowHide.forEach(eyeIcon => {
+    eyeIcon.addEventListener("click", () => {
+        let pwFields = eyeIcon.parentElement.parentElement.querySelectorAll(".password");
+        pwFields.forEach(password => {
+        if (password.type === "password") { // If password is hidden
+            password.type = "text"; // Show password
+            eyeIcon.classList.replace("bx-hide", "bx-show"); // Change icon to show state
+            return;
+        }
+        password.type = "password"; // Hide password
+        eyeIcon.classList.replace("bx-show", "bx-hide"); // Change icon to hide state
+        });
+    });
+    });
 
     increaseButton.forEach((increaseBtn, index) => {
         increaseBtn.addEventListener('click', () => {
@@ -30,10 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
             contents[index].classList.add('active');
         });
     })
-
-    const toggleSliderActive = (isActive) => {
-        sliderContainer.classList.toggle('price-slider-active', isActive);
-    };
 
     if (slider) {
         slider.addEventListener('mousedown', () => toggleSliderActive(true));
@@ -61,16 +87,114 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    setTimeout(() => {
-        const messages = document.querySelectorAll('.msg');
-        messages.forEach(message => {
-            message.style.transition = 'opacity 0.5s ease';
-            message.style.opacity = '0';
-            setTimeout(() => message.remove(), 500);
+    const fileInput = document.getElementById('id_image');
+    const currentlyInput = document.getElementById('currently');
+
+    // product preview
+    const title = document.getElementById('id_title');
+    const description = document.getElementById('id_description');
+    const price = document.getElementById('id_price');
+    const old_price = document.getElementById('id_old_price');
+    const category = document.getElementById('id_category');
+
+    const prev_title = document.getElementById('prev-title');
+    const prev_desc = document.getElementById('prev-desc');
+    const prev_price = document.getElementById('prev-price');
+    const prev_old_price = document.getElementById('prev-old-price');
+    const prev_category = document.getElementById('prev-ctitle');
+    const prev_disc = document.getElementById('prev-disc');
+    const prev_image = document.getElementById('prev-img');
+
+    const bars = document.querySelector('.bars');
+    const dropdown = document.querySelector('.bars-dropdown');
+
+    const close_sidecart = document.getElementById('closeCart');
+    const side_cart = document.getElementById('cart-sidebar');
+
+    const navbar = document.querySelector('.navbar');
+    const navbar_open = document.querySelector('.navbar__open');
+    const navbar_close = document.querySelector('.navbar__close');
+
+    if (bars) {
+        bars.addEventListener('click', () => {
+            dropdown.style.display = getComputedStyle(dropdown).display === 'flex' ? 'none' : 'flex';
         });
-    }, 2000);
     
-    const mainImage = document.getElementById('mainImage');
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.bars') && !e.target.closest('.dropdown')) {
+                dropdown.style.display = 'none';
+            }
+        });
+    }
+
+    if (navbar_open || navbar_close) {
+        navbar_open.addEventListener('click', () => {
+            navbar.style.display = "flex";
+            navbar_open.style.display = "none";
+        });
+    
+        navbar_close.addEventListener('click', () => {
+            navbar.style.display = "none";
+            navbar_open.style.display = "flex";
+        });
+    }
+
+    if (close_sidecart) {
+        close_sidecart.addEventListener('click', () => {
+            side_cart.classList.add('hidden');
+        });
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+    
+                reader.onload = function(e) {
+                    currentlyInput.value = file.name;
+                    prev_image.src = e.target.result;
+                };
+    
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    if (title || description || category || price || old_price) {
+        title.addEventListener('input', () => {
+            prev_title.textContent = title.value || '';
+        });
+    
+        description.addEventListener('input', () => {
+            prev_desc.textContent = description.value || '';
+        });
+    
+        category.addEventListener('input', () => {
+            prev_category.textContent = category.value || '';
+        });
+    
+        price.addEventListener('input', () => {
+            prev_price.textContent = price.value || '0.00';
+        });
+    
+        old_price.addEventListener('input', () => {
+            const oldPriceValue = parseFloat(old_price.value) || 0;
+            const priceValue = parseFloat(price.value) || 0;
+            prev_old_price.textContent = oldPriceValue ? `$${oldPriceValue.toFixed(2)}` : '0.00';
+    
+            const discount = oldPriceValue > 0 ? (((oldPriceValue - priceValue) / oldPriceValue) * 100).toFixed(0) : 0;
+            prev_disc.textContent = `-${discount}%`;
+        });
+    }
+});
+
+const monthNames = ["Jan", "Feb", "Mar", "April",
+    "May", "June", "July", "Aug", "Sept", "Oct",
+    "Nov", "Dec"
+];
+
+const mainImage = document.getElementById('mainImage');
     
     function changeMainImage(clickedExtraImage) {
         const newMainImageUrl = clickedExtraImage.src;
@@ -85,30 +209,76 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     }
     
-    let currentIndex = 0;
-    
-    function moveSlide(direction) {
-        const slides = document.querySelector('.slides');
-        const totalSlides = slides.children.length;
-        const maxIndex = totalSlides - 3; // максимальный индекс для показа 3 изображений
-    
-        currentIndex += direction;
-    
-        if (currentIndex < 0) {
-            currentIndex = maxIndex;
-        } else if (currentIndex > maxIndex) {
-            currentIndex = 0;
-        }
-    
-        slides.style.transform = `translateX(-${currentIndex * 75}%)`;
-    
-    }
-});
+let currentIndex = 0;
 
-const monthNames = ["Jan", "Feb", "Mar", "April",
-    "May", "June", "July", "Aug", "Sept", "Oct",
-    "Nov", "Dec"
-];
+function handleSearch() {
+    document.querySelector('#search-form').style.display = 'block';
+    
+    document.getElementById('wishlist-cont').style.display = 'none';
+    document.getElementById('cart-cont').style.display = 'none';
+}
+
+function moveSlide(direction) {
+    const slides = document.querySelector('.slides');
+    const totalSlides = slides.children.length;
+    const maxIndex = totalSlides - 3;
+
+    currentIndex += direction;
+
+    if (currentIndex < 0) {
+        currentIndex = maxIndex;
+    } else if (currentIndex > maxIndex) {
+        currentIndex = 0;
+    }
+
+    slides.style.transform = `translateX(-${currentIndex * 75}%)`;
+
+}
+
+function initializeDropdown(barsSelector, dropdownSelector, svgBtnsSelector) {
+    const bars = document.querySelector(barsSelector);
+    const dropdown = document.querySelector(dropdownSelector);
+    const svg_btns = document.querySelector(svgBtnsSelector);
+
+    if (!bars || !dropdown || !svg_btns) {
+        console.error("Один или несколько элементов не найдены!");
+        return;
+    }
+
+    // Обработчик для открытия/закрытия меню
+    bars.addEventListener('click', () => {
+        dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    // Обработчик для кликов вне меню
+    svg_btns.addEventListener('click', (e) => {
+        if (!bars.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+}
+
+$(document).ready(function () {
+    // Decrease quantity
+    $(document).on("click", ".decrease", function () {
+        let productId = $(this).attr("data-product");
+        let quantityInput = $("#product-quantity-" + productId);
+        let currentValue = parseInt(quantityInput.text()) || 0; // Ensure currentValue is a valid number
+
+        if (currentValue > 1) {
+            quantityInput.text(currentValue - 1); // Decrease value
+        }
+    });
+
+    // Increase quantity
+    $(document).on("click", ".increase", function () {
+        let productId = $(this).attr("data-product");
+        let quantityInput = $("#product-quantity-" + productId);
+        let currentValue = parseInt(quantityInput.text()) || 0; // Ensure currentValue is a valid number
+
+        quantityInput.text(currentValue + 1); // Increase value
+    });
+});
 
 $(document).ready(function (){
     $("#reviewForm").on("submit", function(event){
@@ -282,9 +452,11 @@ $(document).ready(function (){
                     console.log("Adding products to cart...");
                 },
                 success: function(response){
-                    this_val.html('<i class="fas fa-shopping-cart"></i><i class="fa-solid fa-check"></i>');
                     console.log("Added products to cart...");
-                    $(".cart-count").text(response.total_cart_items)
+                    $("#cart-sidebar").removeClass('hidden');
+                    $(".cart-count").text(response.total_cart_items).hide().fadeIn(500);
+
+                    renderCart(response.cart_data);
                 },
                 error: function(){
                     console.log("Failed to add products to cart...")
@@ -293,6 +465,37 @@ $(document).ready(function (){
         }
     
     })
+
+    function renderCart(cartData) {
+        console.log("Rendering Cart:", cartData);  // Log the cart data to verify it's being passed
+        let $cartSidebarItems = $(".cart-sidebar-items");
+        $cartSidebarItems.empty(); // Clear existing items
+    
+        // Loop through cart data and regenerate HTML
+        for (let productId in cartData) {
+            let product = cartData[productId];
+            $cartSidebarItems.append(`
+                <div class="cart-sidebar-item">
+                    <img src="${product.image}" alt="${product.title}" />
+                    <div class="cart-sidebar-item-details">
+                        <div class="line">
+                            <h3>${product.title}</h3>
+                            <p class="price"><span>$</span><span>${product.price}</span></p>
+                        </div>
+                        <div class="btns">
+                            <div class="quantity-controls">
+                                <button class="decrease" data-product="${productId}">-</button>
+                                <span class="quantity" id="product-quantity-${productId}">${product.quantity}</span>
+                                <button class="increase" data-product="${productId}">+</button>
+                            </div>
+                            <button class="delete-side-product" data-product="${productId}"><i class="fa-solid fa-trash-can"></i></button>
+                            <button class="update-side-product" data-product="${productId}"><i class="fa-solid fa-arrows-rotate"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+    }
     
     $(document).on("click", ".delete-product", function(){
     
@@ -319,11 +522,64 @@ $(document).ready(function (){
 
     })
 
+    $(document).on("click", ".delete-side-product", function(){
+    
+        let product_id = $(this).attr("data-product")
+        let this_val = $(this)
+    
+        console.log("Product ID: ", product_id);
+
+        $.ajax({
+            url: "/delete-from-side-cart",
+            data: {
+                "id": product_id,
+            },
+            dataType: "json",
+            beforeSend: function(){
+                this_val.hide()
+            },
+            success: function(response){
+                this_val.show()
+                this_val.closest(".cart-sidebar-item").remove();
+                $(".cart-count").text(response.total_cart_items)
+            }
+        })
+
+    })
+
     $(document).on("click", ".update-product", function(){
     
         let product_id = $(this).attr("data-product")
         let this_val = $(this)
-        let quantity = $("#product-quantity-" + product_id).val()
+        let quantity = $("#product-quantity-" + product_id).text()
+    
+        console.log("Product ID: ", product_id);
+        console.log("Product Quantity: ", quantity);
+
+        $.ajax({
+            url: "/update-cart",
+            data: {
+                "id": product_id,
+                "quantity": quantity,
+            },
+            dataType: "json",
+            beforeSend: function(){
+                this_val.hide()
+            },
+            success: function(response){
+                this_val.show()
+                $(".cart-count").text(response.total_cart_items)
+                $("#cart-page").html(response.data)
+            }
+        })
+
+    })
+    
+    $(document).on("click", ".update-side-product", function(){
+    
+        let product_id = $(this).attr("data-product")
+        let this_val = $(this)
+        let quantity = $("#product-quantity-" + product_id).text()
     
         console.log("Product ID: ", product_id);
         console.log("Product Quantity: ", quantity);
@@ -507,7 +763,9 @@ $(document).ready(function (){
             success: function(response){
                 console.log("Sent data to server.")
                 $("#contact-form").hide()
-                $("#message-response").html("Message sent successfully")
+                $("#contact-img").hide()
+                $(".contact-container").hide()
+                $("#message-response").show()
             }
         })
     })

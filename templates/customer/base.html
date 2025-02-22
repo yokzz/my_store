@@ -1,0 +1,62 @@
+{% load static %}
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Poppins&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AXG2FqENmi4prLZbBTPuPy8kpKVdS8ex7jO7XYhdfUpOP-M25dSGmgP01KVttVLGM8vWIZOqv_ZcVuO5&currency=USD"></script>
+</head>
+
+<header id="dashboard">
+<nav class="navbar">
+    <ul class="navbar__menu">
+        <li class="navbar__item">
+            <label class="navbar___link navbar__close"><i class="fa-solid fa-arrow-left"></i><span>Hide</span></label>
+        </li>
+        <li class="navbar__item">
+            <label for="tab-1" class="navbar__link"><i class="fa-solid fa-bars"></i><span>Dashboard</span></label>
+        </li>
+        <li class="navbar__item">
+            <label for="tab-2" class="navbar__link"><i class="fa-solid fa-truck"></i><span>Orders</span></label>        
+        </li>
+        <li class="navbar__item">
+            <label for="tab-3" class="navbar__link"><i class="fa-solid fa-location-dot"></i><span>Shipping Address</span></label>        
+        </li>
+        <li class="navbar__item">
+            <label for="tab-4" class="navbar__link"><i class="fa-solid fa-user"></i><span>Profile</span></label>
+        </li>
+        <li class="navbar__item">
+            <a href="{% url 'store:product-list' %}" class="navbar__link"><i class="fa-solid fa-arrow-rotate-left"></i><span>Back to Shop</span></a> 
+        </li>      
+    </ul>
+</nav>
+
+<div class="navbar__open">
+    <i class="fa-solid fa-arrow-right"></i>
+</div>
+</header>
+
+<body>
+    <div class="container" id="dashboard-messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="msg msg-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    {% block content %}
+
+    {% endblock content %}
+<script src="{% static 'js/function.js' %}"></script>
+</body>

@@ -11,17 +11,43 @@
         <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Poppins&display=swap" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
         <script src="https://js.braintreegateway.com/web/dropin/1.43.0/js/dropin.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- Boxicons CSS -->
+        <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
     </head>
     <header>
-        <a class="btn-small btn-beige" href="{% url 'useradmin:dashboard' %}">Dashboard</a>
-        <a class="btn-small btn-beige" href="{% url 'useradmin:products' %}">Products</a>
-        <a class="btn-small btn-beige" href="{% url 'useradmin:change-password' %}">Change Password</a>
+        <nav class="navbar">
+            <ul class="navbar__menu">
+                <li class="navbar__item">
+                    <a href="{% url 'useradmin:dashboard' %}" class="navbar__link"><i class="fas fa-bars"></i><span>Dashboard</span></a>
+                </li>
+                <li class="navbar__item">
+                    <a href="{% url 'useradmin:change-password' %}" class="navbar__link"><i class="fa-solid fa-key"></i><span>Change Password</span></a>
+                </li>
+                <li class="navbar__item">
+                    <a href="{% url 'useradmin:add-product' %}" class="navbar__link"><i class="fas fa-box"></i><span>Add Product</span></a>
+                </li>
+                <li class="navbar__item">
+                    <a href="{% url 'useradmin:products' %}" class="navbar__link"><i class="fas fa-cart-arrow-down"></i><span>Products</span></a>
+                </li>
+                <li class="navbar__item">
+                    <a href="{% url 'store:index' %}" class="navbar__link"><i class="fa-solid fa-arrow-rotate-left"></i><span>Back to Shop</span></a> 
+                </li>      
+            </ul>
+        </nav>
     </header>
     <body>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="msg msg-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
         {% block content %}
 

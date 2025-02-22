@@ -14,16 +14,23 @@ import datetime
 
 @admin_required
 def dashboard(request):
-    revenue = CartOrder.objects.filter(paid_status=True).aggregate(price=Sum("price"))
     total_orders_count = CartOrder.objects.filter(paid_status=True)
     all_products = Product.objects.all()
     all_categories = Category.objects.all()
     new_customers = User.objects.all().order_by("-id")
-    latest_orders = CartOrder.objects.filter(paid_status=True)
+    latest_orders = CartOrder.objects.filter(paid_status=True).order_by("-order_date")
     
     this_month = datetime.datetime.now().month
     
-    monthly_revenue = CartOrder.objects.filter(order_date__month=this_month, paid_status=True).aggregate(price=Sum("price"))
+    if CartOrder.objects.filter(paid_status=True).aggregate(price=Sum("price")) != None:
+        revenue = CartOrder.objects.filter(paid_status=True).aggregate(price=Sum("price"))
+    else:
+        revenue = 0.00
+    
+    if CartOrder.objects.filter(order_date__month=this_month, paid_status=True).aggregate(price=Sum("price")) != None: 
+        monthly_revenue = CartOrder.objects.filter(order_date__month=this_month, paid_status=True).aggregate(price=Sum("price"))
+    else: 
+        monthly_revenue = 0.00
     
     context = {
         "revenue": revenue,
@@ -57,15 +64,16 @@ def add_product(request):
             new_form = form.save(commit=False)
             new_form.user = request.user
             new_form.save()
-            
+            messages.success(request, "Product added successfully!")
             return redirect("useradmin:products")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = AddProductForm()
             
     context = {
         "form": form,
     }
-            
     return render(request, "useradmin/add-product.html", context)
 
 @admin_required
@@ -84,6 +92,7 @@ def edit_product(request, pid):
             
     context = {
         "form": form,
+        "product": product,
     }
             
     return render(request, "useradmin/edit-product.html", context)
@@ -130,7 +139,6 @@ def change_order_status(request, id):
     return redirect("useradmin:order-detail", order.id)
 
 @admin_required
-@login_required
 def change_password(request):
     user = request.user
     

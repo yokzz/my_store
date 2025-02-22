@@ -3,3 +3,4 @@ pillow-10.4.0
 shortuuid-1.0.13
 django-5.0.7
 paypal-1.2.5
+pyjwt

@@ -7,6 +7,15 @@ def default(request):
     categories = Category.objects.all()
     min_price = Product.objects.aggregate(Min('price'))
     max_price = Product.objects.aggregate(Max('price'))
+    cart_total_amount = 0
+    
+    if 'cart_data_obj' in request.session:
+        for product_id, product in request.session['cart_data_obj'].items():
+            cart_total_amount += int(product['quantity']) * float(product['price'])
+    else: 
+        request.session['cart_data_obj'] = {}
+            
+    
     try:
         profile = Profile.objects.get(user=request.user)
     except:
@@ -30,4 +39,6 @@ def default(request):
         'profile': profile,
         'min_price': min_price,
         'max_price': max_price,
+        "cart_data": request.session['cart_data_obj'],
+        'total_cart_items': len(request.session['cart_data_obj']),
     }

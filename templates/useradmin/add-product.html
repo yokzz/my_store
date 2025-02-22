@@ -1,64 +1,124 @@
 {% extends 'useradmin/base.html' %}
 {% block content %}
 
-<h2>Create Product</h2>
 <div class="product-container">
     <form id="add-product-form" enctype="multipart/form-data" method="POST">
         {% csrf_token %}
-        <div class="form-group">
-            <label for="title">Title:</label>
-            {{ form.title }}
+        
+        <div class="two-inputs">
+            <div class="input-container">
+                <label for="title">Title</label>
+                {{ form.title }}
+            </div>
+
+            <div class="input-container" id="img">
+                <label for="id_image">Currently</label>
+                <input type="text" id="currently" name="currently" value="{{ product.image }}" readonly/>
+                {{ form.image }}
+                <label class="change" for="id_image">Change</label>
+            </div>  
         </div>
 
-        <div class="form-group">
-            <label for="image">Image:</label>
-            {{ form.image }}
+        <div class="inputs">
+            <div class="large-box">
+                <div class="input-container" id="desc">
+                    <label for="description">Description</label>
+                    {{ form.description }} 
+                </div>
+            </div>
+
+            <div class="small-boxes">
+                <div class="small-box">
+                    <div class="input-container" id="price">
+                        <label for="price">Price</label>
+                        {{ form.price }}
+                    </div>
+                </div>
+                <div class="small-box">
+                    <div class="input-container" id="old_price">
+                        <label for="old_price">Old Price</label>
+                        {{ form.old_price }}
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="price">Price:</label>
-            {{ form.price }}
+
+        <div class="inputs" id="below">
+            <div class="large-box" id="below">
+                <div class="input-container" id="spec">
+                    <label for="specifications">Specifications</label>
+                    {{ form.specifications }}
+                </div>
+
+                <div class="input-container" id="stock">
+                    <label for="stock_count">Stock Count</label>
+                    {{ form.stock_count }}
+                </div>
+            </div>
+
+            <div class="small-boxes" id="below">
+                <div class="small-box" id="below">
+                    <div class="input-container" id="select">
+                        <label for="product_status" id="select">Product Status</label>
+                        {{ form.product_status }}
+                    </div>
+                </div>
+
+                <div class="small-box" id="below">
+                    <div class="input-container" id="select">
+                        <label for="category" id="select">Category</label>
+                        {{ form.category }}
+                    </div>
+                </div>
+                
+                <div class="small-box" id="below">
+                    <div class="input-container" id="select">
+                        <label for="vendor" id="select">Vendor</label>
+                        {{ form.vendor }}
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="old_price">Price without discount:</label>
-            {{ form.old_price }}
-        </div>
-
-        <div class="form-group">
-            <label for="currency">Currency:</label>
-            <select>
-                <option>USD</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="description">Description:</label>
-            {{ form.description }}
-        </div>
-
-        <div class="form-group">
-            <label for="specifications">Specifications:</label>
-            {{ form.specifications }}
-        </div>
-
-        <div class="form-group">
-            <label for="stock_count">Product in Stock:</label>
-            {{ form.stock_count }}
-        </div>
-
-        <div class="form-group">
-            <label for="product_status">Product Status:</label>
-            {{ form.product_status }}
-        </div>
-
-        <div class="form-group">
-            <label for="in_stock">In Stock:</label>
-            {{ form.in_stock }}
-        </div>
-
-        <button type="submit" class="submit-btn">Submit</button>
+        <button type="submit" class="btn-beige">Submit</button>
     </form>
+
+    <div class="product-item">
+        <div class="discount-badge" id="prev-disc"></div>
+        <!-- Product Image -->
+        <div class="images" id="slider">
+            <div class="slides">
+                <div class="slide active">
+                    <img id="prev-img" src="" alt=""/>
+                </div>
+            </div>
+        </div>
+        <!-- Product Properties -->
+        <div class="product">
+            <!-- Product Category -->
+            <div style="display: flex; flex-direction: column;">
+                <p id="prev-ctitle"></p>
+                <h1><a href="#" id="prev-title"></a></h1>
+            </div>
+            <div class="cnt-price">
+                <h2>$</h2><h2 style="margin-right: 7px;" class="current-price-" id="prev-price"></h2>
+                <h2 class="old-price" id="prev-old-price"></h2>
+            </div>
+            <p class="description" id="prev-desc"></p>
+
+            <div class="buttons">
+                <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ product.id }}"/>
+                <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
+                <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
+                <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
+                <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
+                <button type="submit" class="add-to-cart-btnn btn add" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart" style="margin-right: 10px;"></i>Add</button>
+                <button type="submit" class="add-to-wishlistt btn like" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart wishlist-svg"></i></button>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 {% endblock content %}

@@ -6,6 +6,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 
 STATUS_CHOICE = (
     ("processing", "Processing"),
+    ("ontheway", "On the way"),
     ("shipped", "Shipped"),
     ("delivered", "Delivered"),
 )
@@ -101,7 +102,7 @@ class Product(models.Model):
     old_price = models.DecimalField(max_digits=12, decimal_places=2, default="2.99")
     
     type = models.CharField(max_length=63, default ="Organic", null=True, blank=True)
-    stock_count = models.CharField(max_length=63, default="12", null=True, blank=True)
+    stock_count = models.IntegerField(default="42")
     life = models.CharField(max_length=63, default="365 Days", null=True, blank=True)
     mfd = models.DateTimeField(auto_now_add=False, null=True, blank=True)
     
@@ -165,12 +166,13 @@ class CartOrder(models.Model):
     saved = models.DecimalField(max_digits=12, decimal_places=2, default="0.00")
     coupons = models.ManyToManyField("store.Coupon", blank=True)
     
+    payment_method = models.CharField(max_length=127, blank=True, null=True)
     shipping_method = models.CharField(max_length=127, blank=True, null=True)
     tracking_id = models.CharField(max_length=127, blank=True, null=True)
     tracking_website = models.CharField(max_length=127, blank=True, null=True)
     
     paid_status = models.BooleanField(default=False)
-    order_date = models.DateTimeField(auto_now_add=True)
+    order_date = models.DateField(auto_now_add=True)
     oid = ShortUUIDField(unique=True, max_length=5, alphabet="1234567890")
     order_status = models.CharField(choices=STATUS_CHOICE, max_length=30, default="processing")
     
@@ -207,7 +209,7 @@ class CartOrderItems(models.Model):
 
 class ProductReview(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True)
-    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, null=True, related_name="reviews")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, related_name="reviews")
     review = RichTextUploadingField()
     rating = models.IntegerField(choices=RATING, default=None)
     date = models.DateTimeField(auto_now_add=True)

@@ -1,5 +1,6 @@
 from store.models import Product
 from django import forms
+from decimal import Decimal
 
 class AddProductForm(forms.ModelForm):
     title = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Enter product title"}))
@@ -22,4 +23,15 @@ class AddProductForm(forms.ModelForm):
             'stock_count',
             'product_status',
             'in_stock',
+            'category',
+            'vendor',
         ]
+        
+    def clean_price(self):
+        price = self.cleaned_data['price']
+
+        return round(Decimal(price), 2)
+    
+    def clean_old_price(self):
+        old_price = self.cleaned_data['old_price']
+        return round(Decimal(old_price), 2)

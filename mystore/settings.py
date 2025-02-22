@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 import jazzmin
+import jwt
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,6 +35,19 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True 
+
+AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend'
+]
+
+SITE_ID = 2
+
+SOCIALACCOUNT_LOGIN_ON_GET=True
 
 # Application definition
 
@@ -38,6 +55,7 @@ INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'userauths',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -51,6 +69,12 @@ INSTALLED_APPS = [
     'ckeditor',
     'paypal.standard.ipn',
     'mathfilters',
+    
+    # all auth configurations
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google'
 ]
 
 MIDDLEWARE = [
@@ -61,7 +85,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    'allauth.account.middleware.AccountMiddleware',
 ]
+
 
 ROOT_URLCONF = 'mystore.urls'
 
@@ -147,7 +174,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 JAZZMIN_SETTINGS = {
     "site_header": "Madarima",
     "site_brand": "Madarima",
@@ -158,6 +184,9 @@ JAZZMIN_SETTINGS = {
 AUTH_USER_MODEL = 'userauths.User'
 
 LOGIN_URL = 'userauths:sign-in'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 

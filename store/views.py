@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.core import serializers
 import uuid
+import json
 
 
 from store.models import Product, Category, Vendor, CartOrder, CartOrderItems, Wishlist, Tags, ProductImages, ProductReview, Address, Coupon, ProductSpecifications
@@ -204,6 +205,7 @@ def product_filter_view(request):
 
 def add_to_cart(request):
     cart_products = {}
+    product_id = str(request.GET['id'])
     
     cart_products[str(request.GET['id'])] = {
         'title': request.GET['title'], 
@@ -214,20 +216,27 @@ def add_to_cart(request):
     }
     
     if 'cart_data_obj' in request.session:
-        if str(request.GET['id']) in request.session['cart_data_obj']:
-            cart_data = request.session['cart_data_obj']
-            cart_data[str(request.GET['id'])]['quantity'] = int(cart_products[str(request.GET['id'])]['quantity'])
-            cart_data.update(cart_data)
-            request.session['cart_data_obj'] = cart_data
+        cart_data = request.session['cart_data_obj']
+        if str(request.GET['id']) in cart_data:
+            cart_data[str(request.GET['id'])]['quantity'] = int(cart_data[str(request.GET['id'])]['quantity']) + int(cart_products[str(request.GET['id'])]['quantity'])
         else:
-            cart_data = request.session['cart_data_obj']
             cart_data.update(cart_products)
-            request.session['cart_data_obj'] = cart_data
+        request.session['cart_data_obj'] = cart_data
             
     else:
         request.session['cart_data_obj'] = cart_products
         
-    return JsonResponse({"data": request.session['cart_data_obj'], 'total_cart_items': len(request.session['cart_data_obj'])})
+    data = {
+        "product_id": product_id,
+        "product_title": cart_products[product_id]['title'],
+        "product_price": cart_products[product_id]['price'],
+        "product_image": cart_products[product_id]['image'],
+        "quantity": cart_products[product_id]['quantity'],
+        "total_cart_items": len(request.session['cart_data_obj']),
+        "cart_data": request.session['cart_data_obj'],
+    }
+        
+    return JsonResponse(data)
 
 def cart_view(request):
     cart_total_amount = 0
@@ -235,16 +244,18 @@ def cart_view(request):
     if request.user.is_authenticated:
         if CartOrder.objects.filter(user=request.user, paid_status=False).count() > 0:
             unpaid_orders = CartOrderItems.objects.filter(order__user=request.user, order__paid_status=False)
+            unpaid_order = CartOrder.objects.filter(user=request.user, paid_status=False).last()
             unpaid_total = CartOrderItems.objects.filter(order__user=request.user, order__paid_status=False).first().order.price
         else:
             unpaid_total = None
+            unpaid_order = None
             unpaid_orders = None
     else:
+        unpaid_order = None
         unpaid_orders = None
         unpaid_total = None
         
     if 'cart_data_obj' in request.session:
-        
         for product_id, product in request.session['cart_data_obj'].items():
             cart_total_amount += int(product['quantity']) * float(product['price'])     
             
@@ -258,6 +269,7 @@ def cart_view(request):
                                                    'total_cart_items': len(request.session['cart_data_obj']), 
                                                    'cart_total_amount':cart_total_amount,
                                                    'active_address': active_address,
+                                                   'unpaid_order': unpaid_order,
                                                    'unpaid_orders': unpaid_orders,
                                                    'unpaid_total': unpaid_total})
     
@@ -265,6 +277,23 @@ def cart_view(request):
         return render(request, "store/cart.html", {'total_cart_items': 0, 'cart_total_amount': 0})
     
 def delete_from_cart(request):
+    product_id = str(request.GET['id'])
+    if 'cart_data_obj' in request.session:
+        if product_id in request.session['cart_data_obj']:
+            cart_data = request.session['cart_data_obj']
+            del request.session['cart_data_obj'][product_id]
+            request.session['cart_data_obj'] = cart_data
+            
+    cart_total_amount = 0
+    if 'cart_data_obj' in request.session:
+        for product_id, product in request.session['cart_data_obj'].items():
+            cart_total_amount += int(product['quantity']) * float(product['price'])
+            
+    
+    data = render_to_string("store/async/cart-page.html", {"cart_data": request.session['cart_data_obj'], 'total_cart_items': len(request.session['cart_data_obj']), 'cart_total_amount':cart_total_amount})
+    return JsonResponse({"data": data, 'total_cart_items': len(request.session['cart_data_obj'])})
+
+def delete_from_side_cart(request):
     product_id = str(request.GET['id'])
     if 'cart_data_obj' in request.session:
         if product_id in request.session['cart_data_obj']:
@@ -311,7 +340,7 @@ def update_cart(request):
                 active_address = Address.objects.get(user=request.user, status=True)
             except:
                 active_address = None  
-            
+                
     
     context = {
         "cart_data": request.session['cart_data_obj'],
@@ -320,6 +349,31 @@ def update_cart(request):
         'active_address': active_address,
         'unpaid_orders': unpaid_orders,
         'unpaid_total': unpaid_total,
+    }
+    
+    data = render_to_string("store/async/cart-page.html", context, request)
+    return JsonResponse({"data": data, 'total_cart_items': len(request.session['cart_data_obj'])})
+
+def update_side_cart(request):
+    product_id = str(request.GET['id'])
+    quantity = request.GET['quantity']
+    
+    if 'cart_data_obj' in request.session:
+        if product_id in request.session['cart_data_obj']:
+            cart_data = request.session['cart_data_obj']
+            cart_data[str(request.GET['id'])]['quantity'] = quantity
+            request.session['cart_data_obj'] = cart_data
+            
+    cart_total_amount = 0
+    if 'cart_data_obj' in request.session:
+        for product_id, product in request.session['cart_data_obj'].items():
+            cart_total_amount += int(product['quantity']) * float(product['price'])
+                
+    
+    context = {
+        "cart_data": request.session['cart_data_obj'],
+        'total_cart_items': len(request.session['cart_data_obj']),
+        'cart_total_amount':cart_total_amount,
     }
     
     data = render_to_string("store/async/cart-page.html", context, request)
@@ -448,6 +502,11 @@ def checkout_view(request, id):
     
     discount_amount = 0
     if request.method == "POST":
+        data = json.loads(request.body)
+        payment_method = data.get("fundingSource")
+        
+        print("method", payment_method)
+        
         code = request.POST["code"]
         try:
             coupon = Coupon.objects.get(code=code, active=True)

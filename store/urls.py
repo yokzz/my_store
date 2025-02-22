@@ -1,5 +1,5 @@
 from django.urls import path
-from store.views import index, category_list_view, product_list_view, product_detail_view, category_product_list_view, vendor_list_view, vendor_detail_view, ajax_add_review, search_view, product_filter_view, add_to_cart, cart_view, delete_from_cart, update_cart, checkout_view, wishlist_view, add_to_wishlist, remove_from_wishlist, save_checkout_info, delete_unpaid, edit_unpaid
+from store.views import index, category_list_view, product_list_view, product_detail_view, category_product_list_view, vendor_list_view, vendor_detail_view, ajax_add_review, search_view, product_filter_view, add_to_cart, cart_view, delete_from_cart, update_cart, checkout_view, wishlist_view, add_to_wishlist, remove_from_wishlist, save_checkout_info, delete_unpaid, edit_unpaid, delete_from_side_cart, update_side_cart
 
 urlpatterns = [
     # Home page URL
@@ -10,7 +10,6 @@ urlpatterns = [
     path("products/<pid>/", product_detail_view, name="product-detail"),
     
     # Category URL
-    path("category/", category_list_view, name="category-list"),
     path("category/<cid>/", category_product_list_view, name="category-product-list"),
 
     # Vendor URL
@@ -31,9 +30,15 @@ urlpatterns = [
 
     # Delete from cart URL
     path("delete-from-cart/", delete_from_cart, name="delete-from-cart"),
+    
+    # Delete from side cart URL
+    path("delete-from-side-cart/", delete_from_side_cart, name="delete-from-side-cart"),
 
     # Update cart URL
     path("update-cart/", update_cart, name="update-cart"),
+    
+    # Update side cart URL
+    path("update-cart/", update_side_cart, name="update-cart"),
 
     # Cart URL
     path("view-cart/", cart_view, name="cart"),

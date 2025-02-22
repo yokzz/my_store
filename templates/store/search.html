@@ -22,14 +22,14 @@
                 <div>To: <span class="featured-text">${{ max_price.price__max|floatformat:2 }}</span></div>
             </div>
             <div class="price-webkit-change">
-                <input type="number" class="price-input" id="max_price" value="{{ min_price.price__min|floatformat:2 }}" min="{{ min_price.price__min|floatformat:2 }}" max="{{ max_price.price__max|floatformat:2 }}" style="width: 100%;" onkeyup="range.value=this.value"/>
+                <input type="number" class="prc-input" id="max_price" value="{{ min_price.price__min|floatformat:2 }}" min="{{ min_price.price__min|floatformat:2 }}" max="{{ max_price.price__max|floatformat:2 }}" style="width: 100%;" onkeyup="range.value=this.value"/>
                 <div class="webkit-btn">
-                    <button id="btn-decrease">
+                    <button id="prc-decrease">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="16" width="16">
                             <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/>
                         </svg>
                     </button>
-                    <button id="btn-increase">
+                    <button id="prc-increase">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="16" width="16">
                             <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
                         </svg>
@@ -46,9 +46,9 @@
             {% if query %}
             <h1 class="search-title">{{ query }}</h1>
             {% else %}
-            <h1 class="seacrh-title">You didn't search anything</h1>
+            <h1 class="search-title">You didn't search anything</h1>
             {% endif %}
-            <p>We found <span class="featured-text">{{ products.count }}</span> item{{ products.count|pluralize }} for you!</p>
+            <p>We found <span id="searched-products" class="featured-text">{{ products.count }}</span> item{{ products.count|pluralize }} for you!</p>
         </div>
         <div class="product-list" id="filtered-product">
             {% for product in products %}
