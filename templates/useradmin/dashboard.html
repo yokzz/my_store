@@ -1,6 +1,58 @@
 {% extends 'useradmin/base.html' %}
 {% block content %}
 <div class="stats">
+    <div class="item" id="sm-devices">
+        <div class="body">
+            <div class='item-mini' id="revenue">
+                <div class="body">
+                    <div class="icon"><i class="fas fa-coins"></i></div>
+                    <div class="text">
+                        <h3>Revenue</h3>
+                        {% if revenue.price != None %}
+                        <p>${{ revenue.price|floatformat:2 }}</p>
+                        {% else %}
+                        <p>$0.00</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class='item-mini' id="orders">
+                <div class="body">
+                    <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="text">
+                        <h3>Orders</h3>
+                        <p>{{ total_orders_count.count }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class='item-mini' id="products">
+                <div class="body">
+                    <div class="icon"><i class="fa-solid fa-box"></i></div>
+                    <div class="text">
+                        <h3>Products</h3>
+                        <p>{{ all_products.count }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class='item-mini' id="monthly-earnings">
+                <div class="body">
+                    <div class="icon"><i class="fas fa-wallet"></i></div>
+                    <div class="text">
+                        <h3>Monthly Earnings</h3>
+                        {% if monthly_revenue.price != None %}
+                        <p>${{ monthly_revenue.price|floatformat:2 }}</p>
+                        {% else %}
+                        <p>$0.00</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="item revenue">
         <div class="body">
             <div class="icon"><i class="fas fa-coins"></i></div>
@@ -16,7 +68,7 @@
     </div>
     <div class="item orders">
         <div class="body">
-            <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+            <div class="icon"><i class="fas fa-wallet"></i></div>
             <div class="text">
                 <h3>Orders</h3>
                 <p>{{ total_orders_count.count }}</p>
@@ -70,9 +122,9 @@
                 {% if order.paid_status == True %}
                 <tr class="item">
                     <td class="hashtag">#</td>
-                    <td>{{ order.id }}</td>
+                    <td class="padding-id">{{ order.id }}</td>
                     <td class="text-small">{{ order.first_name }} {{ order.last_name }}</td>
-                    <td class="text-small">{{ order.email }}</td>
+                    <td class="text-small padding-email">{{ order.email }}</td>
                     <td class="text-small padding-phone">{{ order.phone_number }}</td>
                     <td class="text-small padding-order-date">{{ order.order_date }}</td>
                     {% if order.order_status == "processing" %}
@@ -94,7 +146,7 @@
                         </svg>
                         Delivered</span></td>
                     {% endif %}
-                    <td><span class="btn-small paid">
+                    <td class="paid-status"><span class="btn-small paid">
                         <svg class="check-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                             <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/>
                         </svg>
@@ -112,9 +164,9 @@
                 {% else %}
                 <tr class="item">
                     <td class="hashtag">#</td>
-                    <td>{{ order.id }}</td>
+                    <td class="padding-id">{{ order.id }}</td>
                     <td class="text-small">{{ order.first_name }} {{ order.last_name }}</td>
-                    <td class="text-small">{{ order.email }}</td>
+                    <td class="text-small padding-email">{{ order.email }}</td>
                     <td class="text-small padding-phone">{{ order.phone_number }}</td>
                     <td class="text-small padding-order-date">{{ order.order_date }}</td>
                     {% if order.order_status == "processing" %}
@@ -136,7 +188,7 @@
                         </svg>
                         Delivered</span></td>
                     {% endif %}
-                    <td><span class="btn-small unpaid">
+                    <td class="paid-status"><span class="btn-small unpaid">
                         <svg class="xmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
                             <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
                         </svg>

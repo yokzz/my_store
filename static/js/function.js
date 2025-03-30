@@ -162,12 +162,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (title || description || category || price || old_price) {
+        function truncateText(text, maxLength = 75) {
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+
         title.addEventListener('input', () => {
             prev_title.textContent = title.value || '';
         });
     
         description.addEventListener('input', () => {
-            prev_desc.textContent = description.value || '';
+            prev_desc.textContent = truncateText(description.value);
         });
     
         category.addEventListener('input', () => {
@@ -687,24 +691,38 @@ $(document).ready(function (){
     // Adding to wishlist
     $(document).on("click", ".add-to-wishlist", function(){
         let product_id = $(this).attr("data-product-item")
+        let in_wishlist = $(this).attr("in-wishlist")
+        let isInWishlist = in_wishlist === "true";
         let this_val = $(this)
 
         console.log("ID:", product_id)
-        console.log("Current element: ", this_val)
+        console.log("Current element: ", this_val);
         
         $.ajax({
-            url: "/add-to-wishlist",
+            url: isInWishlist ? "/remove-from-wishlist-card" : "/add-to-wishlist",
             data: {
                 "id": product_id,
             },
             dataType: "json",
             beforeSend: function(){
-                this_val.html('<i class="fa-solid fa-heart"></i>')
+                this_val.html('<i class="fa-solid fa-spinner fa-spin"></i>');
             },
             success: function(response){
                 if (response.bool == true) {
                     console.log("Added to wishlist")
                     $(".wishlist-count").text(response.wishlist_count)
+                }
+
+                else {
+                    $(".wishlist-count").text(response.wishlist_count)
+                }
+
+                if (isInWishlist) {
+                    this_val.html('<i class="fa-regular fa-heart"></i>');
+                    this_val.attr("in-wishlist", "false");
+                } else {
+                    this_val.html('<i class="fa-solid fa-heart"></i>');
+                    this_val.attr("in-wishlist", "true");
                 }
             }
         })
@@ -728,8 +746,7 @@ $(document).ready(function (){
             },
             success: function(response){
                 $("#wishlist").html(response.data)
-                $(".wishlist-count").text(response.data.bool)
-                console.log(response.data.bool)
+                $(".wishlist-count").text(response.wishlist_count)
             }
         })
     })

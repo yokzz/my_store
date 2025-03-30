@@ -38,7 +38,11 @@
                     <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
                     <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
                     <button type="submit" class="add-to-cart-btn btn add" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add</button>
-                    <button type="submit" class="add-to-wishlist btn like" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart wishlist-svg"></i></button>
+                    {% if product.id in wishlist_obj %}
+                        <button type="submit" class="add-to-wishlist btn like" in-wishlist="true" data-product-item="{{ product.id }}"><i class="fa-solid fa-heart wishlist-svg"></i></button>
+                    {% else %}
+                        <button type="submit" class="add-to-wishlist btn like" in-wishlist="false" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart wishlist-svg "></i></button>
+                    {% endif %}
                 </div>
             </div>
         </div>

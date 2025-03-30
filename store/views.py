@@ -245,15 +245,20 @@ def cart_view(request):
         if CartOrder.objects.filter(user=request.user, paid_status=False).count() > 0:
             unpaid_orders = CartOrderItems.objects.filter(order__user=request.user, order__paid_status=False)
             unpaid_order = CartOrder.objects.filter(user=request.user, paid_status=False).last()
-            unpaid_total = CartOrderItems.objects.filter(order__user=request.user, order__paid_status=False).first().order.price
+            unpaid_total = CartOrderItems.objects.filter(order__user=request.user, order__paid_status=False).first().order.price  
         else:
             unpaid_total = None
             unpaid_order = None
             unpaid_orders = None
     else:
-        unpaid_order = None
-        unpaid_orders = None
-        unpaid_total = None
+        if CartOrder.objects.filter(session_key=request.session.session_key, paid_status=False).count() > 0:
+            unpaid_orders = CartOrderItems.objects.filter(order__session_key=request.session.session_key, order__paid_status=False)
+            unpaid_order = CartOrder.objects.filter(session_key=request.session.session_key, paid_status=False).last()
+            unpaid_total = CartOrderItems.objects.filter(order__session_key=request.session.session_key, order__paid_status=False).first().order.price  
+        else:
+            unpaid_total = None
+            unpaid_order = None
+            unpaid_orders = None
         
     if 'cart_data_obj' in request.session:
         for product_id, product in request.session['cart_data_obj'].items():
@@ -457,7 +462,7 @@ def save_checkout_info(request):
                     return redirect("store:cart")
             else:
                 order = CartOrder.objects.create(
-                            user=request.user,
+                            session_key=request.session.session_key,
                             price=total_amount,
                             first_name=first_name,
                             last_name=last_name,
@@ -497,7 +502,15 @@ def save_checkout_info(request):
 
 def checkout_view(request, id):
     order = CartOrder.objects.get(id=id)
-    orders = CartOrder.objects.filter(user=request.user)
+    if request.user.is_authenticated:
+        orders = CartOrder.objects.filter(user=request.user)
+    else:
+        session_key = request.session.session_key
+        if not session_key:
+            request.session.create()
+            session_key = request.session.session_key
+        orders = CartOrder.objects.filter(session_key=session_key)
+
     order_items = CartOrderItems.objects.filter(order=order)
     
     discount_amount = 0
@@ -589,6 +602,40 @@ def add_to_wishlist(request):
     return JsonResponse(context)
 
 @login_required
+def remove_from_wishlist_card(request):
+    product_id = request.GET.get("id")  # Получаем ID товара
+
+    if not product_id:
+        return JsonResponse({"error": "ID товара не передан"}, status=400)
+
+    # Ищем объект вишлиста по товару и пользователю
+    wishlist_item = Wishlist.objects.filter(product_id=product_id, user=request.user).first()
+
+    if wishlist_item:
+        wishlist_id = wishlist_item.id
+        wishlist_item.delete()
+    else:
+        wishlist_id = None
+
+    # Пересчитываем оставшиеся товары
+    wishlist = Wishlist.objects.filter(user=request.user)
+    wishlist_count = wishlist.count()
+    
+    context = {
+        "bool": True,
+        "wishlist_obj": wishlist,
+        "wishlist_count": wishlist_count
+    }
+    wishlist_html = render_to_string("store/async/wishlist.html", context, request=request)
+
+    return JsonResponse({
+        "success": True,
+        "wishlist_count": wishlist_count,
+        "wishlist_html": wishlist_html,
+        "wishlist_id": wishlist_id
+    })
+
+@login_required
 def remove_from_wishlist(request):
     id = request.GET['id']
     wishlist = Wishlist.objects.filter(user=request.user)
@@ -602,14 +649,13 @@ def remove_from_wishlist(request):
     context = {
         "bool": True,
         "wishlist_obj": wishlist,
-        "wishlist_count": wishlist_count,
     }
     
     wishlist_json = serializers.serialize('json', wishlist)
     
     data = render_to_string("store/async/wishlist.html", context)
     
-    return JsonResponse({"data": data, "wishlist": wishlist_json})
+    return JsonResponse({"data": data, "wishlist": wishlist_json, "wishlist_count": wishlist_count})
 
 def delete_unpaid(request):
     delete_unpaid = CartOrder.objects.filter(user=request.user, paid_status=False).delete()

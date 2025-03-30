@@ -30,6 +30,7 @@ urlpatterns = [
 
     path('accounts/', include('allauth.urls')),
     path('ckeditor/', include("ckeditor_uploader.urls")),
+    path('shopify/', include('shopify_app.urls')),
 ]
 
 if settings.DEBUG:

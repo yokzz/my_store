@@ -17,9 +17,11 @@
             </div>
             {% for order in order_items %}
             <div class="checkout-item">
-                <img src="{{ order.image }}" alt="{{ order.item }}" />
-                <div class="title-price">
+                <div class="flex">
+                    <img src="{{ order.image }}" alt="{{ order.item }}" />
                     <p class="title">{{ order.item|truncatechars:50 }}</p>
+                </div>
+                <div class="title-price">
                     <div class="price-container">
                         <p class="price"><span>$</span><span class="current-price-{{ order_id }}">{{ order.price|floatformat:2 }}</span></p>
                         <div class="input-wrapper">

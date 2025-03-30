@@ -16,7 +16,14 @@ import jazzmin
 import jwt
 from dotenv import load_dotenv
 
+import shopify
+
 load_dotenv()
+
+
+SHOPIFY_API_KEY = os.getenv("SHOPIFY_API_KEY")
+SHOPIFY_API_SECRET = os.getenv("SHOPIFY_API_SECRET")
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +40,7 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.0.106"]
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
@@ -64,6 +71,7 @@ INSTALLED_APPS = [
     'store',
     'payment',
     'customer',
+    'my_shopify_app',
     
     # Third party
     'ckeditor',
@@ -181,7 +189,7 @@ JAZZMIN_SETTINGS = {
     "copyright" : "madarima.com ",
 }
 
-AUTH_USER_MODEL = 'userauths.User'
+AUTH_USER_MODEL = 'my_shopify_app.AuthAppShopUser'
 
 LOGIN_URL = 'userauths:sign-in'
 

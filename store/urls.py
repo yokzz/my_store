@@ -1,5 +1,5 @@
 from django.urls import path
-from store.views import index, category_list_view, product_list_view, product_detail_view, category_product_list_view, vendor_list_view, vendor_detail_view, ajax_add_review, search_view, product_filter_view, add_to_cart, cart_view, delete_from_cart, update_cart, checkout_view, wishlist_view, add_to_wishlist, remove_from_wishlist, save_checkout_info, delete_unpaid, edit_unpaid, delete_from_side_cart, update_side_cart
+from store.views import index, category_list_view, product_list_view, product_detail_view, category_product_list_view, vendor_list_view, vendor_detail_view, ajax_add_review, search_view, product_filter_view, add_to_cart, cart_view, delete_from_cart, update_cart, checkout_view, wishlist_view, add_to_wishlist, remove_from_wishlist, save_checkout_info, delete_unpaid, edit_unpaid, delete_from_side_cart, update_side_cart, remove_from_wishlist_card
 
 urlpatterns = [
     # Home page URL
@@ -57,6 +57,7 @@ urlpatterns = [
 
     # Removing from Wishlist URL
     path("remove-from-wishlist/", remove_from_wishlist, name="remove-from-wishlist"),
+    path("remove-from-wishlist-card/", remove_from_wishlist_card, name="remove-from-wishlist-card"),
     
     # Delete Unpaid Order URL
     path("delete-unpaid/", delete_unpaid, name="delete-unpaid"),

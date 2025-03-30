@@ -149,12 +149,14 @@ class ProductImages(models.Model):
         
         
 class CartOrder(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     
     first_name = models.CharField(max_length=63)
     last_name = models.CharField(max_length=63)
     email = models.EmailField()
     phone_number = models.CharField(max_length=63)
+    
+    session_key = models.CharField(max_length=40, blank=True, null=True)
     
     address = models.CharField(max_length=127, null=True)
     country = models.CharField(max_length=127, blank=True, null=True)

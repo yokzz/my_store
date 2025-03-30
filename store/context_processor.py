@@ -25,6 +25,11 @@ def default(request):
         wishlist = Wishlist.objects.filter(user=request.user).count()
     except:
         wishlist = None
+        
+    try:
+        wishlist_obj = Wishlist.objects.filter(user=request.user).values_list('product__id', flat=True)
+    except:
+        wishlist_obj = None
     
     try:
         address = Address.objects.get(user=request.user)
@@ -36,6 +41,7 @@ def default(request):
         'categories': categories,
         'address': address,
         'wishlist': wishlist,
+        'wishlist_obj': wishlist_obj,
         'profile': profile,
         'min_price': min_price,
         'max_price': max_price,

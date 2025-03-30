@@ -23,6 +23,9 @@
         <nav class="navbar">
             <ul class="navbar__menu">
                 <li class="navbar__item">
+                    <label class="navbar___link navbar__close"><i class="fa-solid fa-arrow-left"></i><span>Hide</span></label>
+                </li>
+                <li class="navbar__item">
                     <a href="{% url 'useradmin:dashboard' %}" class="navbar__link"><i class="fas fa-bars"></i><span>Dashboard</span></a>
                 </li>
                 <li class="navbar__item">
@@ -39,6 +42,10 @@
                 </li>      
             </ul>
         </nav>
+
+        <div class="navbar__open">
+            <i class="fa-solid fa-arrow-right"></i>
+        </div>
     </header>
     <body>
         {% if messages %}
