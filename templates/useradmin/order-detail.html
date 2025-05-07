@@ -1,0 +1,104 @@
+{% extends 'useradmin/base.html' %}
+{% block content %}
+
+<h3 class="header">Order Detail</h3>
+
+<div class="order-details">
+    <div class="order-info">
+        <div class="info-card">
+            <i class="fa-solid fa-calendar icon"></i>
+            <h5>Order Date</h5>
+            <p>{{ order.order_date }}</p>
+            <h5>Order ID:</h5>
+            <p>{{ order.id }}</p>
+            <div class="change-order-status">
+                <form method="POST" action="{% url 'useradmin:change-order-status' order.id %}">
+                    {% csrf_token %}
+                    <select name="status">
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                    </select>
+                    <button type="submit" class="view-order">Save</button>
+                </form>
+            <div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="customer-info">
+        <div class="info-card">
+            <i class="fa-solid fa-user icon"></i>
+            <h5>Customer</h5>
+            <p>{{ order.first_name }} {{ order.last_name }}</p>
+            <p>Email: {{ order.email }}</p>
+            <p>Phone: {{ order.phone_number }}</p>
+        </div>
+        <div class="info-card">
+            <i class="fa-solid fa-truck icon"></i>
+            <h5>Order Info</h5>
+            <p>Shipping Method: {{ order.shipping_method }}</p>
+            <p>Order ID: #{{ order.id }}</p>
+            <p>Order Status: {{ order.order_status.title }}</p>
+        </div>
+        <div class="info-card">
+            <i class="fa-solid fa-location-dot icon"></i>
+            <h5>Deliver To</h5>
+            <p>Address: {{ order.address }}</p>
+            <p>City: {{ order.city }}</p>
+            <p>State: {{ order.state }}</p>
+            <p>Country: {{ order.country }}</p>
+            <p>Post Code: {{ order.post_code }}</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <h5 class="table-header">Order Items</h5>
+    <table class="order-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Unit Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in order_items %}
+            <tr>
+                <td>
+                    <img src="{{ product.image }}" height="64" width="64" alt="{{ product.item }}">
+                    {{ product.item }}
+                </td>
+                <td>${{ product.price }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>${{ product.total }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="3">
+                    <dl>
+                        <dt>Tax:</dt>
+                        <dd>$0.00</dd>
+                    <dl>
+                    <dl>
+                        <dt>Discount:</dt>
+                        <dd>${{ order.saved }}</dd>
+                    <dl>
+                    <dl>
+                        <dt>Shipping Cost:</dt>
+                        <dd>$0.00</dd>
+                    <dl>
+                    <dl>
+                        <dt>Grand Total:</dt>
+                        <dd>${{ order.price }}</dd>
+                    <dl>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,227 @@
+{% extends 'useradmin/base.html' %}
+{% block content %}
+<div class="stats">
+    <div class="item" id="sm-devices">
+        <div class="body">
+            <div class='item-mini' id="revenue">
+                <div class="body">
+                    <div class="icon"><i class="fas fa-coins"></i></div>
+                    <div class="text">
+                        <h3>Revenue</h3>
+                        {% if revenue.price != None %}
+                        <p>${{ revenue.price|floatformat:2 }}</p>
+                        {% else %}
+                        <p>$0.00</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class='item-mini' id="orders">
+                <div class="body">
+                    <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="text">
+                        <h3>Orders</h3>
+                        <p>{{ total_orders_count.count }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class='item-mini' id="products">
+                <div class="body">
+                    <div class="icon"><i class="fa-solid fa-box"></i></div>
+                    <div class="text">
+                        <h3>Products</h3>
+                        <p>{{ all_products.count }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class='item-mini' id="monthly-earnings">
+                <div class="body">
+                    <div class="icon"><i class="fas fa-wallet"></i></div>
+                    <div class="text">
+                        <h3>Monthly Earnings</h3>
+                        {% if monthly_revenue.price != None %}
+                        <p>${{ monthly_revenue.price|floatformat:2 }}</p>
+                        {% else %}
+                        <p>$0.00</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="item revenue">
+        <div class="body">
+            <div class="icon"><i class="fas fa-coins"></i></div>
+            <div class="text">
+                <h3>Revenue</h3>
+                {% if revenue.price != None %}
+                <p>${{ revenue.price|floatformat:2 }}</p>
+                {% else %}
+                <p>$0.00</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="item orders">
+        <div class="body">
+            <div class="icon"><i class="fas fa-wallet"></i></div>
+            <div class="text">
+                <h3>Orders</h3>
+                <p>{{ total_orders_count.count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="item products">
+        <div class="body">
+            <div class="icon"><i class="fa-solid fa-box"></i></div>
+            <div class="text">
+                <h3>Products</h3>
+                <p>{{ all_products.count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="item monthly-earnings">
+        <div class="body">
+            <div class="icon"><i class="fas fa-wallet"></i></div>
+            <div class="text">
+                <h3>Monthly Earnings</h3>
+                {% if monthly_revenue.price != None %}
+                <p>${{ monthly_revenue.price|floatformat:2 }}</p>
+                {% else %}
+                <p>$0.00</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="order-container">
+    <div class="orders-box">
+        <table>
+            <thead>
+                <tr class="heading">
+                    <th class="hashtag"></th>
+                    <th>Order</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Order Date</th>
+                    <th>Order Status</th>
+                    <th>Paid Status</th>
+                    <th>Total</th>
+                    <th class="check-order"></th>
+                </tr>
+            </thead>
+            {% if latest_orders %}
+            <tbody>
+                {% for order in latest_orders %}
+                {% if order.paid_status == True %}
+                <tr class="item">
+                    <td class="hashtag">#</td>
+                    <td class="padding-id">{{ order.id }}</td>
+                    <td class="text-small">{{ order.first_name }} {{ order.last_name }}</td>
+                    <td class="text-small padding-email">{{ order.email }}</td>
+                    <td class="text-small padding-phone">{{ order.phone_number }}</td>
+                    <td class="text-small padding-order-date">{{ order.order_date }}</td>
+                    {% if order.order_status == "processing" %}
+                    <td><span class="btn-small status">
+                        <svg class="processing-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                            <path d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/>
+                            </svg>
+                        Processing</span></td>
+                    {% elif order.order_status == "shipped" %}
+                    <td><span class="btn-small status">
+                        <svg class="shipped-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                            <path d="M112 0C85.5 0 64 21.5 64 48l0 48L16 96c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0 208 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 160l-16 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l16 0 176 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 224l-48 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0 144 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 288l0 128c0 53 43 96 96 96s96-43 96-96l128 0c0 53 43 96 96 96s96-43 96-96l32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-64 0-32 0-18.7c0-17-6.7-33.3-18.7-45.3L512 114.7c-12-12-28.3-18.7-45.3-18.7L416 96l0-48c0-26.5-21.5-48-48-48L112 0zM544 237.3l0 18.7-128 0 0-96 50.7 0L544 237.3zM160 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96zm272 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0z"/>
+                        </svg>
+                        Shipped</span></td>
+                    {% else %}
+                    <td><span class="btn-small status">
+                        <svg class="delivered-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                            <path d="M58.9 42.1c3-6.1 9.6-9.6 16.3-8.7L320 64 564.8 33.4c6.7-.8 13.3 2.7 16.3 8.7l41.7 83.4c9 17.9-.6 39.6-19.8 45.1L439.6 217.3c-13.9 4-28.8-1.9-36.2-14.3L320 64 236.6 203c-7.4 12.4-22.3 18.3-36.2 14.3L37.1 170.6c-19.3-5.5-28.8-27.2-19.8-45.1L58.9 42.1zM321.1 128l54.9 91.4c14.9 24.8 44.6 36.6 72.5 28.6L576 211.6l0 167c0 22-15 41.2-36.4 46.6l-204.1 51c-10.2 2.6-20.9 2.6-31 0l-204.1-51C79 419.7 64 400.5 64 378.5l0-167L191.6 248c27.8 8 57.6-3.8 72.5-28.6L318.9 128l2.2 0z"/>
+                        </svg>
+                        Delivered</span></td>
+                    {% endif %}
+                    <td class="paid-status"><span class="btn-small paid">
+                        <svg class="check-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                            <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/>
+                        </svg>
+                        Paid
+                        </span>
+                    </td>
+                    <td class="total">${{ order.price }}</td>
+                    <td class="view"><a class="btn-small btn-view" href="{% url 'useradmin:order-detail' order.id %}">
+                        <svg class="view-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                            <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/>
+                        </svg>
+                        View</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr class="item">
+                    <td class="hashtag">#</td>
+                    <td class="padding-id">{{ order.id }}</td>
+                    <td class="text-small">{{ order.first_name }} {{ order.last_name }}</td>
+                    <td class="text-small padding-email">{{ order.email }}</td>
+                    <td class="text-small padding-phone">{{ order.phone_number }}</td>
+                    <td class="text-small padding-order-date">{{ order.order_date }}</td>
+                    {% if order.order_status == "processing" %}
+                    <td><span class="btn-small status">
+                        <svg class="processing-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                            <path d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/>
+                            </svg>
+                        Processing</span></td>
+                    {% elif order.order_status == "shipped" %}
+                    <td><span class="btn-small status">
+                        <svg class="shipped-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                            <path d="M112 0C85.5 0 64 21.5 64 48l0 48L16 96c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0 208 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 160l-16 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l16 0 176 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 224l-48 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0 144 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 288l0 128c0 53 43 96 96 96s96-43 96-96l128 0c0 53 43 96 96 96s96-43 96-96l32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-64 0-32 0-18.7c0-17-6.7-33.3-18.7-45.3L512 114.7c-12-12-28.3-18.7-45.3-18.7L416 96l0-48c0-26.5-21.5-48-48-48L112 0zM544 237.3l0 18.7-128 0 0-96 50.7 0L544 237.3zM160 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96zm272 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0z"/>
+                        </svg>
+                        Shipped</span></td>
+                    {% else %}
+                    <td><span class="btn-small status">
+                        <svg class="delivered-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                            <path d="M58.9 42.1c3-6.1 9.6-9.6 16.3-8.7L320 64 564.8 33.4c6.7-.8 13.3 2.7 16.3 8.7l41.7 83.4c9 17.9-.6 39.6-19.8 45.1L439.6 217.3c-13.9 4-28.8-1.9-36.2-14.3L320 64 236.6 203c-7.4 12.4-22.3 18.3-36.2 14.3L37.1 170.6c-19.3-5.5-28.8-27.2-19.8-45.1L58.9 42.1zM321.1 128l54.9 91.4c14.9 24.8 44.6 36.6 72.5 28.6L576 211.6l0 167c0 22-15 41.2-36.4 46.6l-204.1 51c-10.2 2.6-20.9 2.6-31 0l-204.1-51C79 419.7 64 400.5 64 378.5l0-167L191.6 248c27.8 8 57.6-3.8 72.5-28.6L318.9 128l2.2 0z"/>
+                        </svg>
+                        Delivered</span></td>
+                    {% endif %}
+                    <td class="paid-status"><span class="btn-small unpaid">
+                        <svg class="xmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+                        </svg>
+                        Unpaid
+                        </span>
+                    </td>
+                    <td class="total">${{ order.price }}</td>
+                    <td class="view">
+                        <a class="btn-small btn-view" href="{% url 'useradmin:order-detail' order.id %}">
+                            <svg class="view-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/>
+                            </svg>
+                            View
+                        </a>
+                    </td>
+                </tr>
+                
+                {% endif %}
+                {% endfor %}
+            </tbody>
+            {% else %}
+            <tbody>
+                <tr class="item">
+                    <td class="hashtag">#</td>
+                    <td class="item-margin"></td>
+                    <td class="product-price"></td>
+                    <td class="item-margin"></td>
+                    <td class="item-margin"></td>
+                    <td class="view"></td>
+                </tr>
+            </tbody>
+            {% endif %}
+        </table>
+    </div>
+</div>
+{% endblock content %}

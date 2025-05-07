@@ -2,27 +2,40 @@
 {% load static %}
 
 {% block content %}
-
 <h1>Categories</h1>
 
-<div>
-    <h2>Categories ({{ categories.count }})</h2>
+<div class="category-dropdown">
+    <label for="category-select">Select a Category:</label>
+    <select id="category-select" onchange="window.location.href=this.value;">
+        <option value="" disabled selected>Select a category</option>
+        {% for category in categories %}
+        <option value="{% url 'store:category-product-list' category.cid %}">
+            {{ category.title }} ({{ category.category.count }})
+        </option>
+        {% endfor %}
+    </select>
 </div>
-{% for category in categories %}
-<!-- Category Image -->
-<div>
-    <img src="{{ category.image.url }}" alt="" height="128" width="128" />
-</div>
-<!-- Category Title -->
-<div>
-    <a href="#">{{ category.title }}</a>
-</div>
-<!-- Category Product Count -->
-<div>
-    <span>{{ category.category.count }} Product{{ category.category.count|pluralize }}</span>
-</div>
-<br>
 
-{% endfor %}
+<div class="categories-list">
+    <h2>Categories ({{ categories.count }})</h2>
+    {% for category in categories %}
+    <!-- Category Item -->
+    <div class="category-item">
+        <!-- Category Image -->
+        <div class="category-image">
+            <img src="{{ category.image.url }}" alt="" height="128" width="128" />
+        </div>
+        <!-- Category Title -->
+        <div class="category-title">
+            <a href="{% url 'store:category-product-list' category.cid %}">{{ category.title }}</a>
+        </div>
+        <!-- Category Product Count -->
+        <div class="category-count">
+            <span>{{ category.category.count }} Product{{ category.category.count|pluralize }}</span>
+        </div>
+    </div>
+    <br>
+    {% endfor %}
+</div>
 
 {% endblock content %}

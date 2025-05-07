@@ -1,0 +1,500 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<svg style="display:none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+    <defs>
+      <symbol id="fivestars">
+        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill-rule="evenodd"/>
+        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill-rule="evenodd" transform="translate(24)"/>
+        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill-rule="evenodd" transform="translate(48)"/>
+        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill-rule="evenodd" transform="translate(72)"/>
+        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill-rule="evenodd"  transform="translate(96)"/>
+      </symbol>
+    </defs>
+</svg>
+<div id="review-container">
+
+</div>
+<!-- Product Section -->
+<div class="product-section">
+    <div class="product-card">
+        <!-- Product Image Gallery -->
+        <div class="product-images">
+            <div class="main-image">
+                <img id="mainImage" src="{{ product.image.url }}" alt="{{ product.title }}" height="256" width="256" />
+            </div>
+        
+            {% if product_images|length >= 3 %}
+            <div class="extra-images">
+                <button class="prev" onclick="moveSlide(-1)">&#10094;</button>
+                <div class="slides">
+                    <div class="extra-image">
+                        <img id="mainImage"
+                            src="{{ product.image.url }}" alt="{{ product.title }}" 
+                            onclick="changeMainImage(this)" />
+                    </div>
+                    {% for image in product_images %}
+                    <div class="extra-image">
+                        <img id="extraImage-{{ loop.index }}" loopid="{{ loop.index }}" 
+                            src="{{ image.images.url }}" alt="Дополнительное изображение" 
+                            onclick="changeMainImage(this)" />
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="next" onclick="moveSlide(1)">&#10095;</button>
+            </div>
+            {% elif product_images|length > 0 and product_images|length < 3 %}
+            <div class="extra-images">
+                <div class="extra-image">
+                    <img id="mainImage"
+                        src="{{ product.image.url }}" alt="{{ product.title }}" 
+                        onclick="changeMainImage(this)" />
+                </div>
+                {% for image in product_images %}
+                <div class="extra-image">
+                    <img id="extraImage-{{ loop.index }}" loopid="{{ loop.index }}" 
+                        src="{{ image.images.url }}" alt="Дополнительное изображение" 
+                        onclick="changeMainImage(this)" />
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Product Details -->
+        <div class="product-details">
+            {% comment %} <div class="discount-badge">
+                <span>Sale Off -{{ product.get_percentage|floatformat:0 }}%</span>
+            </div> {% endcomment %}
+
+            <!-- Product Title -->
+            <div class="title">
+                <h4>{{ product.title|truncatechars:50 }}</h4>
+            </div>
+
+            <div class="star-progress">
+                <progress class="rating-bg" value="{{ average_rating.rating }}" max="5"></progress>
+                <svg><use xlink:href="#fivestars"/></svg>
+            </div>
+
+            <!-- Product Description -->
+            <div class="description">
+                <p>{{ product.description|truncatechars:100|safe }}</p>
+            </div>
+
+            {% comment %} <!-- Product Vendor -->
+            <div class="product-vendor">
+                By <a href="{% url 'store:vendor-detail' product.vendor.vid %}">{{ product.vendor.title }}</a>
+            </div> {% endcomment %}
+
+            <!-- Product Price -->
+            <div class="price">
+                <span class="current-price"><span>$</span><span id="current-price" class="current-price-{{ product.id }}">{{ product.price }}</span></span>
+                <br>
+                {% if product.old_price %}
+                <span class="old-price">${{ product.old_price }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Add to Cart -->
+            <div class="cart">
+                <div class="input-wrapper">
+                    {% comment %} <span class="input-prefix">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="14" width="14">
+                            <path d="M376.6 84.5c11.3-13.6 9.5-33.8-4.1-45.1s-33.8-9.5-45.1 4.1L192 206 56.6 43.5C45.3 29.9 25.1 28.1 11.5 39.4S-3.9 70.9 7.4 84.5L150.3 256 7.4 427.5c-11.3 13.6-9.5 33.8 4.1 45.1s33.8 9.5 45.1-4.1L192 306 327.4 468.5c11.3 13.6 31.5 15.4 45.1 4.1s15.4-31.5 4.1-45.1L233.7 256 376.6 84.5z"/>
+                        </svg>
+                    </span> {% endcomment %}
+                    <input type="number" value="1" min="1" id="product-quantity-{{ product.id }}" class="product-quantity-{{ product.id }}"/>
+                    <div class="webkit-btn">
+                        <button class="qty-decrease" data-product-id="{{ product.id }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="12" width="12">
+                                <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/>
+                            </svg>
+                        </button>
+                        <button class="qty-increase" data-product-id="{{ product.id }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="12" width="12">
+                                <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
+                            </svg>
+                        </button>
+                    </div>  
+                </div>
+                <div class="shop-btns">
+                    <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
+                    <button type="submit" class="btn add-to-cart-btn" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add to cart</button>
+                    {% if product.id in wishlist_obj %}
+                        <button type="submit" class="add-to-wishlist btn like" in-wishlist="true" data-product-item="{{ product.id }}"><i class="fa-solid fa-heart wishlist-svg"></i></button>
+                    {% else %}
+                        <button type="submit" class="add-to-wishlist btn like" in-wishlist="false" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart wishlist-svg "></i></button>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Product Properties -->
+            <div class="properties">
+                <small>Category: <span class="featured-text"/><a href="{% url 'store:category-product-list' product.category.cid %}">{{ product.category.title }}</a></span></small>
+                <small>Type: <span class="featured-text">{{ product.type }}</span></small>
+                <small>SKU: <span class="featured-text">{{ product.sku }}</span></small>
+                <small>MFD: <span class="featured-text">{{ product.mfd|date:"d M, Y" }}</span></small>
+                <small>Life: <span class="featured-text">{{ product.life }}</span></small>
+                {% if product.in_stock == True %}
+                    <small>Stock: <span class="in-stock">In Stock</span></small>
+                {% else %}
+                    <small>Stock: <span class="out-stock">Out of Stock</span></small>
+                {% endif %}
+            </div>
+        </div>
+    <br>
+</div>
+    {% comment %} <div class="info-boxes">
+        <!-- Info Box 1: Address & Return/Warranty -->
+        <div class="info-box-1">
+            <div class="user-address">
+                {% if address %}
+                    <span>
+                        <svg class="gps-sign" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="20" width="20">
+                            <path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/>
+                        </svg>
+
+                        {{ address.city }}, {{ address.address }}
+                    </span>
+                    <br>
+                    {% if address.status %}
+                    <span>
+                        <svg class="check" xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 512 512">
+                            <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/>
+                        </svg>
+                        Verified
+                    </span>
+                    {% else %}
+                    <span>
+                        <svg class="xmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                            <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/>
+                        </svg>
+                        Unverified
+                    </span>
+                    {% endif %}
+                {% else %}
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" height="24" width="24">
+                            <path d="M16 144a144 144 0 1 1 288 0A144 144 0 1 1 16 144zM160 80c8.8 0 16-7.2 16-16s-7.2-16-16-16c-53 0-96 43-96 96c0 8.8 7.2 16 16 16s16-7.2 16-16c0-35.3 28.7-64 64-64zM128 480l0-162.9c10.4 1.9 21.1 2.9 32 2.9s21.6-1 32-2.9L192 480c0 17.7-14.3 32-32 32s-32-14.3-32-32z"/>
+                        </svg>
+                        Set your default<a class="featured-text" href="{% url 'customer:dashboard' %}">address</a>
+                    </span>
+                    <br>
+                {% endif %}
+            </div>
+            <hr>
+            <div class="return-warranty">
+                <h5>Return & Warranty</h5>
+                <span><span class="featured-text" style="font-weight: 600;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="authentic" width="20" height="20" viewBox="0 0 448 512">
+                        <path d="M0 80L0 229.5c0 17 6.7 33.3 18.7 45.3l176 176c25 25 65.5 25 90.5 0L418.7 317.3c25-25 25-65.5 0-90.5l-176-176c-12-12-28.3-18.7-45.3-18.7L48 32C21.5 32 0 53.5 0 80zm112 32a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>
+                    </svg>
+                    {{ product.vendor.authentic_rating }}%</span> 
+                    Authentic</span>
+                <br>
+                <span><span class="featured-text" style="font-weight: 600;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="money-return" width="20" height="20" viewBox="0 0 576 512">
+                        <path d="M312 24l0 10.5c6.4 1.2 12.6 2.7 18.2 4.2c12.8 3.4 20.4 16.6 17 29.4s-16.6 20.4-29.4 17c-10.9-2.9-21.1-4.9-30.2-5c-7.3-.1-14.7 1.7-19.4 4.4c-2.1 1.3-3.1 2.4-3.5 3c-.3 .5-.7 1.2-.7 2.8c0 .3 0 .5 0 .6c.2 .2 .9 1.2 3.3 2.6c5.8 3.5 14.4 6.2 27.4 10.1l.9 .3s0 0 0 0c11.1 3.3 25.9 7.8 37.9 15.3c13.7 8.6 26.1 22.9 26.4 44.9c.3 22.5-11.4 38.9-26.7 48.5c-6.7 4.1-13.9 7-21.3 8.8l0 10.6c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-11.4c-9.5-2.3-18.2-5.3-25.6-7.8c-2.1-.7-4.1-1.4-6-2c-12.6-4.2-19.4-17.8-15.2-30.4s17.8-19.4 30.4-15.2c2.6 .9 5 1.7 7.3 2.5c13.6 4.6 23.4 7.9 33.9 8.3c8 .3 15.1-1.6 19.2-4.1c1.9-1.2 2.8-2.2 3.2-2.9c.4-.6 .9-1.8 .8-4.1l0-.2c0-1 0-2.1-4-4.6c-5.7-3.6-14.3-6.4-27.1-10.3l-1.9-.6c-10.8-3.2-25-7.5-36.4-14.4c-13.5-8.1-26.5-22-26.6-44.1c-.1-22.9 12.9-38.6 27.7-47.4c6.4-3.8 13.3-6.4 20.2-8.2L264 24c0-13.3 10.7-24 24-24s24 10.7 24 24zM568.2 336.3c13.1 17.8 9.3 42.8-8.5 55.9L433.1 485.5c-23.4 17.2-51.6 26.5-80.7 26.5L192 512 32 512c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l36.8 0 44.9-36c22.7-18.2 50.9-28 80-28l78.3 0 16 0 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0-16 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l120.6 0 119.7-88.2c17.8-13.1 42.8-9.3 55.9 8.5zM193.6 384c0 0 0 0 0 0l-.9 0c.3 0 .6 0 .9 0z"/>
+                    </svg>
+                    {{ product.vendor.days_return }}</span> 
+                    Days Return</span>
+                    <br>
+                <span><span class="featured-text" style="font-weight: 600;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="shield-check" width="20" height="20" viewBox="0 0 512 512">
+                        <path d="M269.4 2.9C265.2 1 260.7 0 256 0s-9.2 1-13.4 2.9L54.3 82.8c-22 9.3-38.4 31-38.3 57.2c.5 99.2 41.3 280.7 213.6 363.2c16.7 8 36.1 8 52.8 0C454.7 420.7 495.5 239.2 496 140c.1-26.2-16.3-47.9-38.3-57.2L269.4 2.9zM144 221.3c0-33.8 27.4-61.3 61.3-61.3c16.2 0 31.8 6.5 43.3 17.9l7.4 7.4 7.4-7.4c11.5-11.5 27.1-17.9 43.3-17.9c33.8 0 61.3 27.4 61.3 61.3c0 16.2-6.5 31.8-17.9 43.3l-82.7 82.7c-6.2 6.2-16.4 6.2-22.6 0l-82.7-82.7c-11.5-11.5-17.9-27.1-17.9-43.3z"/>
+                    </svg>
+                    {{ product.vendor.warranty_period }}</span> 
+                    Month{{ product.vendor.warranty_period|pluralize }} Warranty</span>
+            </div>
+        </div>
+
+        <!-- Info Box 2 -->
+        <div class="info-box-2">
+            <span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="rating" width="20" height="20" viewBox="0 0 512 512">
+                    <path d="M4.1 38.2C1.4 34.2 0 29.4 0 24.6C0 11 11 0 24.6 0L133.9 0c11.2 0 21.7 5.9 27.4 15.5l68.5 114.1c-48.2 6.1-91.3 28.6-123.4 61.9L4.1 38.2zm503.7 0L405.6 191.5c-32.1-33.3-75.2-55.8-123.4-61.9L350.7 15.5C356.5 5.9 366.9 0 378.1 0L487.4 0C501 0 512 11 512 24.6c0 4.8-1.4 9.6-4.1 13.6zM80 336a176 176 0 1 1 352 0A176 176 0 1 1 80 336zm184.4-94.9c-3.4-7-13.3-7-16.8 0l-22.4 45.4c-1.4 2.8-4 4.7-7 5.1L168 298.9c-7.7 1.1-10.7 10.5-5.2 16l36.3 35.4c2.2 2.2 3.2 5.2 2.7 8.3l-8.6 49.9c-1.3 7.6 6.7 13.5 13.6 9.9l44.8-23.6c2.7-1.4 6-1.4 8.7 0l44.8 23.6c6.9 3.6 14.9-2.2 13.6-9.9l-8.6-49.9c-.5-3 .5-6.1 2.7-8.3l36.3-35.4c5.6-5.4 2.5-14.8-5.2-16l-50.1-7.3c-3-.4-5.7-2.4-7-5.1l-22.4-45.4z"/>
+                </svg>
+                <span class="percantage"><span class="featured-text" style="font-weight: 600;">{{ rating_percentages.5|floatformat:0 }}%</span></span>
+                Rating
+            </span>
+
+            <span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="ship-on-time" width="20" height="20" viewBox="0 0 640 512">
+                    <path d="M112 0C85.5 0 64 21.5 64 48l0 48L16 96c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0 208 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 160l-16 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l16 0 176 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 224l-48 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0 144 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 288l0 128c0 53 43 96 96 96s96-43 96-96l128 0c0 53 43 96 96 96s96-43 96-96l32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-64 0-32 0-18.7c0-17-6.7-33.3-18.7-45.3L512 114.7c-12-12-28.3-18.7-45.3-18.7L416 96l0-48c0-26.5-21.5-48-48-48L112 0zM544 237.3l0 18.7-128 0 0-96 50.7 0L544 237.3zM160 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96zm272 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0z"/>
+                </svg>
+                <span class="percantage"><span class="featured-text" style="font-weight: 600;">{{ product.vendor.shipping_on_time }}%</span></span>
+                Ship on Time
+            </span>
+        </div>
+    </div> {% endcomment %}
+</div>
+
+<div class="info">
+    <div class="tabs">
+        <input id="tab-1" type="radio" class="tab" name="tab" checked/>
+        <label class="label" for="tab-1">Description</label>
+
+        <input id="tab-2" type="radio" class="tab" name="tab"/>
+        <label class="label" for="tab-2">Additional Info</label>
+
+        <input id="tab-3" type="radio" class="tab" name="tab"/>
+        <label class="label" for="tab-3">Reviews</label>
+
+        
+        <div class="info-content">
+            <!-- Content-1 -->
+            <div class="item description" id="content-1">
+                <h1>Description</h1>
+                <p>{{ product.description|safe }}</p>
+            </div>
+            <!-- Content-2 -->
+            <div class="item specifications" id="content-2">
+                <h1>Specifications</h1>
+                {% for specification in product_specifications %}
+                    <p>{{ specification.field|safe }}</p>
+                {% endfor %}
+            </div>
+                
+            <!-- Content-3 -->
+            <div class="item" id="content-3">
+                <div class="align-box">
+                    <div class="left-section">
+                        <div class="align-container">
+                            {% if request.user.is_authenticated %}
+                            {% if make_review == True %}
+                            <div class="review-container">
+                                <h3 style="display:none;" class="review-title hide-review">Add a review</h3>
+                                <div class="messages">
+                                    <strong id="review-response"></strong>
+                                </div>
+                                <form method="post" action="{% url 'store:ajax-add-review' product.pid %}" class="review-form hide-review-form" id="reviewForm">
+                                    {% csrf_token %}
+                                    <div class="input-container">
+                                        <label for="review">Review</label>
+                                        <textarea id="review" name="review" value="" required placeholder="Tell us about your experience with the product" class="form-input"></textarea>
+                                    </div>
+                                    <div class="rating-input">
+                                        <div class="rating-box">
+                                        <span class="text">Rate us</span>
+                                        <div class="rating-svgs">
+                                                <input type="radio" id="rating-5" name="rating" value="5"/>
+                                                <label for="rating-5" class="rating-5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
+                                                    </svg>
+                                                </label>
+                                                <input type="radio" id="rating-4" name="rating" value="4"/>
+                                                <label for="rating-4" class="rating-4">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
+                                                    </svg>
+                                                </label>
+                                                <input type="radio" id="rating-3" name="rating" value="3"/>
+                                                <label for="rating-3" class="rating-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
+                                                    </svg>
+                                                </label>
+                                                <input type="radio" id="rating-2" name="rating" value="2"/>
+                                                <label for="rating-2" class="rating-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
+                                                    </svg>
+                                                </label>
+                                                <input type="radio" id="rating-1" name="rating" value="1"/>
+                                                <label for="rating-1" class="rating-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" fill-rule="evenodd"/>
+                                                    </svg>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn submit-btn">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Reviews -->
+                        <div class="reviews-container">
+                            <div class="reviews">
+                                <!-- Review form -->
+                                {% for review in reviews %}
+                                <!-- Single Review -->
+                                <div class="single-review">
+                                    <!-- Review User Logo & Username -->
+                                    <div class="review-header">
+                                        <img src="{{ review.user.profile.image.url }}" alt="User Avatar" class="review-avatar" id="review-avatar"/>
+                                        <p class="review-username">{{ review.user.username }}</p>
+                                    </div>
+                                    <!-- Review Content -->
+                                    <div class="review-content">
+                                        <p>{{ review.review|safe }}</p>
+                                    </div>
+                                    <!-- Review Date -->
+                                    <div class="review-date">
+                                        <span>{{ review.date|date:"d M, Y" }}</span>
+                                    </div>
+                                    <!-- Review Rating -->
+                                    <div class="review-rating">
+                                        <div class="star-progress">
+                                            <progress class="rating-bg" value="{{ review.rating }}" max="5"></progress>
+                                            <svg><use xlink:href="#fivestars"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                    </div>
+                    </div>
+                </div>
+                <div class="right-section">
+                    <div class="review-statistics"> 
+                        <div class="average-rating">
+                            {% if average_rating.rating %}
+                            <span class="featured-text" id="avg-rating-count">{{ average_rating.rating|floatformat:1 }}</span> out of 5.0
+                            {% else %}
+                            <span class="featured-text" id="avg-rating-count">0.0</span> out of 5.0
+                            {% endif %}                                                                                                                 
+                        </div>
+                        <div class="star-progress-container">
+                            <div class="row">
+                                <p class="star-label">5 stars</p>
+                                <div class="progress-bar">
+                                    <progress class="5star" value="{{ rating_percentages.5|floatformat:1 }}" max="100"></progress>
+                                </div>
+                            </div>
+                            <div class="row">  
+                                <p class="star-label">4 stars</p>
+                                <div class="progress-bar">
+                                    <progress class="4star" value="{{ rating_percentages.4|floatformat:1 }}" max="100"></progress>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <p class="star-label">3 stars</p>
+                                <div class="progress-bar">
+                                    <progress class="3star" value="{{ rating_percentages.3|floatformat:1 }}" max="100"></progress>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <p class="star-label">2 stars</p>
+                                <div class="progress-bar">
+                                    <progress class="2star" value="{{ rating_percentages.2|floatformat:1 }}" max="100"></progress>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <p class="star-label">1 star</p>
+                                <div class="progress-bar">
+                                    <progress class="1star" value="{{ rating_percentages.1|floatformat:1 }}" max="100"></progress>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Related Products -->
+    <div class="related-products">
+        <h2>Related Products</h2>
+        <div class="related-products-container">
+            {% for related_product in products %}
+            <div class="related-product">
+                <!-- Product Image -->
+                <div class="product-image">
+                    <img src="{{ related_product.image.url }}" alt="{{ related_product.title }}" height="128" width="128" />
+                </div>
+                <!-- Product Title -->
+                <div class="product-title">
+                    <a href="{% url 'store:product-detail' related_product.pid %}">{{ related_product.title|truncatechars:50 }}</a>
+                </div>
+                <!-- Product Price -->
+                <div class="product-price">
+                    <span class="price">${{ related_product.price }}</span>
+                    <br>
+                    <span class="old-price">${{ related_product.old_price }}</span>
+                </div>
+                <!-- Add to Cart -->
+                <div class="cart">
+                    <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
+                    <button type="submit" class="btn add-to-cart-btn" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add</button>
+                    <button type="submit" class="btn add-to-wishlist" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart wishlist-svg"></i></button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <br>
+
+    {% comment %} <!-- Category Filter -->
+    <div class="category-filter">
+        <h1>Categories</h1>
+        {% for category in categories %}
+        <div class="category">
+            <!-- Category Image -->
+            <div class="category-image">
+                <img src="{{ category.image.url }}" alt="{{ category.title }}" height="128" width="128" />
+            </div>
+            <!-- Category Title -->
+            <div class="category-title">
+                <a href="{% url 'store:category-product-list' category.cid %}">{{ category.title }}</a>
+            </div>
+            <!-- Category Product Count -->
+            <div class="category-count">
+                <span>{{ category.category.count }} Product{{ category.category.count|pluralize }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div> {% endcomment %}
+    <div class="cart-sidebar hidden" id="cart-sidebar">
+        <div class="cart-sidebar-header">
+            <h3>Cart</h3>
+            <button id="closeCart" class="close-button"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="cart-sidebar-items">
+            {% for product_id, product in cart_data.items %}
+            <div class="cart-sidebar-item">
+                <img src="{{ product.image }}" alt="product.title" />
+                <div class="cart-sidebar-item-details">
+                    <div class="line">
+                        <h3>{{ product.title }}</h3>
+                        <p class="price"><span>$</span><span>{{ product.price }}</span></p>
+                    </div>
+                    <div class="btns">
+                        <div class="quantity-controls">
+                            <button class="decrease" data-product="{{ product_id }}">-</button>
+                            <span class="quantity" id="product-quantity-{{ product_id }}">{{ product.quantity }}</span>
+                            <button class="increase" data-product="{{ product_id }}">+</button>
+                        </div>
+                        <button class="delete-side-product" data-product="{{ product_id }}"><i class="fa-solid fa-trash-can"></i></button>
+                        <button class="update-side-product" data-product="{{ product_id }}"><i class="fa-solid fa-arrows-rotate"></i></button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="cart-sidebar-footer">
+            <a class="btn-beige" href="{% url 'store:cart' %}">Go to cart</a>
+        </div>
+    </div>
+</div>
+
+<script>
+</script>
+
+{% endblock content %}

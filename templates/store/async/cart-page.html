@@ -1,0 +1,102 @@
+{% load mathfilters %}
+{% if cart_data %}
+<div class="async-cart-section">
+    <h3>You have <span class="featured-text">{{ total_cart_items }}</span> product{{ total_cart_items|pluralize }} in your cart</h3>
+    <div class="cart-items">
+        <table>
+            <tr>
+                <td class="product-td">Product</td>
+                <td class="unit-price-td">Unit</td>
+                <td class="quantity-td">Quantity</td>
+                <td class="subtotal-td">Subtotal</td>
+            </tr>
+        </table>
+        {% for product_id, product in cart_data.items %}
+        <div class="cart-item">
+            <img src="{{ product.image }}" alt="{{ product.title }}" />
+            <a href="{% url 'store:product-detail' product.pid %}" class="title">{{ product.title|truncatechars:50 }}</a>
+            <p class="unit-price">${{ product.price|floatformat:2 }}</p>
+            <div class="quantity-controls">
+                <button class="decrease" data-product="{{ product_id }}">-</button>
+                <span class="quantity" id="product-quantity-{{ product_id }}">{{ product.quantity }}</span>
+                <button class="increase" data-product="{{ product_id }}">+</button>
+            </div>
+            <div class="manage-btns">
+                <p class="subtotal">$<span id="current-price-{{ product_id }}">{{ product.price|floatformat:2|mul:product.quantity|floatformat:2 }}</span></p>
+                <div class="flex">
+                    <button class="update-product refresh" data-product="{{ product_id }}"><i class="fa-solid fa-arrows-rotate"></i></button>
+                    <button class="delete-product trash" data-product="{{ product_id }}"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    </div>
+
+    <div class="async-data-section">
+        <div class="data-items">
+            <form action="{% url 'store:save-checkout-info' %}" method="POST">
+                {% csrf_token %}
+                {% if total_cart_items %}
+                <h3><i class="fa-solid fa-globe"></i>Bio Data</h3>
+                <div class="name">
+                    <div class="input-container">
+                        <label for="first_name">First Name</label>
+                        <input type="text" id="first_name" name="first_name" value="{{ profile.first_name }}" required placeholder="John" class="form-input">
+                    </div>
+                    <div class="input-container">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" id="last_name" name="last_name" value="{{ profile.last_name }}" required placeholder="Wash" class="form-input">
+                    </div>
+                </div>
+                <div class="contant">
+                    <div class="input-container">
+                        <label for="email">Email</label>
+                        <input type="text" id="email" name="email" value="{{ profile.email }}" required placeholder="josh.wash@gmail.com" class="form-input">
+                    </div>
+                    <div class="input-container">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" id="phone" name="phone" value="{{ profile.phone_number }}" required placeholder="+1 (123) 456-7890" class="form-input">
+                    </div>
+                </div>
+                <h3><i class="fas fa-shipping-fast"></i>Shipping Details</h3>
+                <div class="address-info">
+                    <div class="input-container">
+                        <label for="address">Address</label>
+                        <input type="text" id="address" name="address" value="{{ active_address.address }}" required placeholder="Main Street, 123" class="form-input">
+                    </div>
+                    <div class="input-container">
+                        <label for="country">Country</label>
+                        <input type="text" id="country" name="country" value="{{ active_address.country }}" required placeholder="United States" class="form-input">
+                    </div>
+                </div>
+                <div class="cc-info">
+                    <div class="input-container">
+                        <label for="city">City</label>
+                        <input type="text" id="city" name="city" value="{{ active_address.city }}" required placeholder="New York" class="form-input">
+                    </div>
+                    <div class="input-container">
+                        <label for="state">State</label>
+                        <input type="text" id="state" name="state" value="{{ active_address.state }}" required placeholder="New York State" class="form-input">
+                    </div>
+                    <div class="input-container">
+                        <label for="post_code">Post Code</label>
+                        <input type="text" id="post_code" name="post_code" value="{{ active_address.post_code }}" required placeholder="10118" class="form-input">
+                    </div>
+                </div>
+                <div>
+                    <h3>Total: ${{ cart_total_amount|floatformat:2 }}</h4>
+                </div>
+                <div class="btns">
+                    <button class="btn ptc-btn" type="submit">Proceed to Checkout</button>
+                    <a class="btn bts-btn" href="{% url 'store:product-list' %}">Back to Shop</a>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+{% else %}
+<div class="cart-section">
+    <h3 class="cart-heading">You have <span class="featured-text">{{ total_cart_items }}</span> product{{ total_cart_items|pluralize }} in your cart</h3>
+</div>
+{% endif %}

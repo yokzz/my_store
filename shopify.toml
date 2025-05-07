@@ -1,0 +1,5 @@
+name = "Madarima"
+client_id = "a61950a2cbd5f32876b0b55587ec7a27"
+application_url = "http://localhost:8000/"
+embedded = true
+handle = "example-app"

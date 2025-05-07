@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+    <!-- Vendor Title -->
+    <header class="vendor-header">
+        <h1>{{ vendor.title }}</h1>
+    </header>
+
+    <!-- Vendor Image -->
+    <section class="vendor-image">
+        <img src="{{ vendor.image.url }}" alt="{{ vendor.title }}" class="vendor-img" />
+    </section>
+
+    <!-- Vendor Details -->
+    <section class="vendor-details">
+        <p><strong>Since:</strong> {{ vendor.date_of_join|date:"d M, Y"}}</p>
+        <p><strong>Description:</strong> {{ vendor.description }}</p>
+        <p><strong>Address:</strong> {{ vendor.address }}</p>
+        <p><strong>Contact:</strong> {{ vendor.contact }}</p>
+    </section>
+
+    <!-- Vendor Items -->
+    <section class="vendor-items">
+        <h2>Vendor Items</h2>
+        <small>We found <strong>{{ products.count }}</strong> product{{ products.count|pluralize }} from <strong>{{ vendor.title }}</strong></small>
+        <div class="products-list">
+            {% for product in products %}
+            <div class="product-item">
+                <!-- Product Discount -->
+                <div class="product-discount">
+                    <span class="discount-badge">-{{ product.get_percentage|floatformat:0 }}%</span>
+                </div>
+                <!-- Product Image -->
+                <div class="product-image">
+                    <img src="{{ product.image.url }}" alt="{{ product.title }}" />
+                </div>
+                <!-- Product Details -->
+                <div class="product-details">
+                    <a href="{% url 'store:category-product-list' product.category.cid %}" class="product-category">{{ product.category.title }}</a>
+                    <a href="{% url 'store:product-detail' product.pid %}" class="product-title">{{ product.title|truncatechars:50 }}</a>
+                    <div class="product-price">
+                        <span class="current-price">${{ product.price }}</span>
+                        <span class="old-price">${{ product.old_price }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Category Filter -->
+    <section class="category-section">
+        <h2>Category</h2>
+        <div class="categories-list">
+            {% for category in categories %}
+            <div class="category-item">
+                <div class="category-image">
+                    <img src="{{ category.image.url }}" alt="{{ category.title }}" />
+                </div>
+                <div class="category-details">
+                    <a href="{% url 'store:category-product-list' category.cid %}" class="category-title">{{ category.title }}</a>
+                    <p class="category-count">{{ category.category.count }} Product{{ category.category.count|pluralize }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+{% endblock content %}

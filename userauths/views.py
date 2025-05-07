@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from userauths.forms import UserRegisterForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
+from django.contrib.auth.hashers import check_password
 from django.conf import settings
 from userauths.models import User
 
@@ -46,11 +47,12 @@ def login_view(request):
                 login(request, user)
                 messages.success(request, "You are logged in.")
                 return redirect("store:index")
+            
             else: 
-                messages.warning(request, "User does not exist. Create an account.")
+                messages.error(request, "User does not exist. Create an account.")
             
         except:
-            messages.warning(request, f"User with {email} does not exist.")
+            messages.error(request, f"User with {email} does not exist.")
         
             
         

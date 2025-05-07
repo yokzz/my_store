@@ -1,0 +1,38 @@
+{% extends 'useradmin/base.html' %}
+{% block content %}
+<div class="pl-container">
+    <div class="product-list">
+        <div class="labels">
+            <table>
+                <td class="product-td">Product</td>
+                <td class="price-td">Price</td>
+                <td class="stock-td">Stock</td>
+                <td class="status-td">Status</td>
+                <td class="publish-td">Published</td>
+                <td class="add-td">Edit</td>
+                <td class="remove-td">Remove</td>
+            </table>
+        </div>
+        {% for product in all_products %}
+        <div class="product">
+            <img src="{{ product.image.url }}" alt="{{ product.title }}" />
+            <a href="#" class="title">{{ product.title|truncatechars:50 }}</a>
+            <p class="price"><span>$</span><span class="current-price-">{{ product.price|floatformat:2 }}</span></p>
+            {% comment %} <span class="featured-text">$</span><p class="price current-price-{{ wishlist.product.id }}">{{ wishlist.product.price|floatformat:2 }}</p> {% endcomment %}
+            {% if product.stock_count > 0 %}
+                <p class="stock in-stock">{{ product.stock_count }}</p>
+            {% else %}
+                <p class="stock out-stock">{{ product.stock_count }}</p>
+            {% endif %}
+            <p class="status">{{ product.get_product_status_display }}</p>
+            <p class="published">{{ product.date|date }}</p>
+            <div class="flex">
+                <a href="{% url 'useradmin:edit-product' product.pid %}" class="edit" ><i class="fas fa-pencil-alt"></i></a>
+                <a href="{% url 'useradmin:delete-product' product.pid %}" class="trash"><i class="fa-solid fa-trash"></i></a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

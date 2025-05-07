@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="payment-container">
+  
+    <div class="card">
+      
+      <span class="error"><i class="fa-solid fa-xmark"></i></span>
+      
+      <h1 class="card-msg">Payment Fail</h1>
+      
+      <h4><a href="{% url 'customer:contact-us' %}" class="featured-text">Contact us</a> if u have issues with payment</h4>
+      
+    </div>
+    
+</div>
+
+{% endblock content %}

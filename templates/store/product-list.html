@@ -1,38 +1,132 @@
-{% extends "base.html" %}
-{% load static %}
-
+{% extends 'base.html' %}
 {% block content %}
 
-{% for product in products %}
-<!-- Product Discount -->
-<div>
-    <span>-{{ product.get_percentage|floatformat:0 }}%</span>
-</div>
-<!-- Product Image -->
-<div>
-    <img src="{{ product.image.url }}" alt="" height="128" width="128" />
-</div>
-<!-- Product Category -->
-<div>
-    <a href="#">{{ product.category.title }}</a>
-</div>
-<!-- Product Title -->
-<div>
-    <p>{{ product.title }}</p>
-</div>
-<!-- Product Vendor -->
-<div>
-    <li>By {{ product.vendor.title }}</li>
-</div>
-<!-- Product Price -->
-<div>   
-    <span>${{ product.price }}</span>
-    <br>
-    <span>${{ product.old_price }}</span>
-</div>
-<br>
-<!-- Product End-->
+<div class="layout">
+    <!-- Filter -->
+    <div class="leftbar">
+        <div class="filter-box">
+            <div class="filter">
+                <!-- Category Filter -->
+                {% for category in categories %}
+                <div class="checkbox-wrapper">
+                    <a href="{% url 'store:category-product-list' category.cid %}">{{ category.title }}</a>
+                    <input type="checkbox" id="category-cbx-{{ category.cid }}" class="filter-cbx" data-filter="category" value="{{ category.cid }}"/>
+                    <label for="category-cbx-{{ category.cid }}" class="toggle"><span></span></label>
+                </div>
+                {% endfor %}
+                <!-- Price Filter -->
+                <div class="price-slider">
+                    <input type="range" name="range" id="range" value="{{ min_price.price__min|floatformat:2 }}" min="{{ min_price.price__min }}" max="{{ max_price.price__max }}" style="width: 100%;" oninput="max_price.value=this.value"/>
+                </div>
+                <!-- Min & Max Price-->
+                <div class="price-display">
+                    <div>From: <span class="featured-text">${{ min_price.price__min|floatformat:2 }}</span></div>
+                    <div>To: <span class="featured-text">${{ max_price.price__max|floatformat:2 }}</span></div>
+                </div>
+                <div class="price-webkit-change">
+                    <input type="number" class="prc-input" id="max_price" value="{{ min_price.price__min|floatformat:2 }}" min="{{ min_price.price__min|floatformat:2 }}" max="{{ max_price.price__max|floatformat:2 }}" style="width: 100%;" onkeyup="range.value=this.value"/>
+                    <div class="webkit-btn">
+                        <button id="prc-decrease">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="16" width="16">
+                                <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/>
+                            </svg>
+                        </button>
+                        <button id="prc-increase">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="16" width="16">
+                                <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <button id="price-filter-btn" type="button" class="btn btn-filter">Filter</button>
+            </div>
+        </div>
+    </div>
 
-{% endfor %}
+    <div class="rightbar">
+        <div class="product-list" id="filtered-product">
+            {% for product in products %}
+            <!-- Product Item -->
+            <div class="product-item">
+                <div class="discount-badge">-{{ product.get_percentage|floatformat:0 }}%</div>
+                <!-- Product Image -->
+                <div class="images" id="slider">
+                    <div class="slides">
+                        <div class="slide active">
+                            <img src="{{ product.image.url }}" alt="{{ product.title }}"/>
+                        </div>
+                        {% if product_images %}
+                            {% for image in product_images %}
+                                <div class="slide">
+                                    <img src="{{ image.images.url }}" alt="{{ product.title }}" width="150"/>
+                                </div>
+                                <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
+                                <button class="next" onclick="changeSlide(1)">&#10095;</button>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- Product Properties -->
+                <div class="product">
+                    <!-- Product Category -->
+                    <div style="display: flex; flex-direction: column;">
+                        <p>{{ product.category.title }} </p>
+                        <h1><a href="{% url 'store:product-detail' product.pid %}">{{ product.title|truncatechars:30 }}</a></h1>
+                    </div>
+                    <div class="cnt-price">
+                        <h2>$</h2><h2 style="margin-right: 7px;"class="current-price-{{ product.id }}">{{ product.price }}</h2>
+                        <h2 class="old-price">${{ product.old_price }}</h2>
+                    </div>
+                    <p class="description">{{ product.description|safe|truncatechars:75 }}</p>
 
+                    <div class="buttons">
+                        <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ product.id }}"/>
+                        <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
+                        <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
+                        <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
+                        <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
+                        <button type="submit" class="add-to-cart-btn btn add" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart" style="margin-right: 10px;"></i>Add</button>
+                        {% if product.id in wishlist_obj %}
+                            <button type="submit" class="add-to-wishlist btn like" in-wishlist="true" data-product-item="{{ product.id }}"><i class="fa-solid fa-heart wishlist-svg"></i></button>
+                        {% else %}
+                            <button type="submit" class="add-to-wishlist btn like" in-wishlist="false" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart wishlist-svg "></i></button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="cart-sidebar hidden" id="cart-sidebar">
+        <div class="cart-sidebar-header">
+            <h3>Cart</h3>
+            <button id="closeCart" class="close-button"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="cart-sidebar-items">
+            {% for product_id, product in cart_data.items %}
+            <div class="cart-sidebar-item">
+                <img src="{{ product.image }}" alt="product.title" />
+                <div class="cart-sidebar-item-details">
+                    <div class="line">
+                        <h3>{{ product.title }}</h3>
+                        <p class="price"><span>$</span><span>{{ product.price }}</span></p>
+                    </div>
+                    <div class="btns">
+                        <div class="quantity-controls">
+                            <button class="decrease" data-product="{{ product_id }}">-</button>
+                            <span class="quantity" id="product-quantity-{{ product_id }}">{{ product.quantity }}</span>
+                            <button class="increase" data-product="{{ product_id }}">+</button>
+                        </div>
+                        <button class="delete-side-product" data-product="{{ product_id }}"><i class="fa-solid fa-trash-can"></i></button>
+                        <button class="update-side-product" data-product="{{ product_id }}"><i class="fa-solid fa-arrows-rotate"></i></button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="cart-sidebar-footer">
+            <a class="btn-beige" href="{% url 'store:cart' %}">Go to cart</a>
+        </div>
+    </div>
+</div>
 {% endblock content %}

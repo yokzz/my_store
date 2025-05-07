@@ -24,6 +24,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("store.urls")),
     path('user/', include("userauths.urls")),
+    path('payment/', include("payment.urls")),
+    path('customer/', include("customer.urls")),
+    path('useradmin/', include("useradmin.urls")),
+
+    path('accounts/', include('allauth.urls')),
+    path('ckeditor/', include("ckeditor_uploader.urls")),
+    path('shopify/', include('shopify_app.urls')),
 ]
 
 if settings.DEBUG:

@@ -13,6 +13,17 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 import jazzmin
+import jwt
+from dotenv import load_dotenv
+
+import shopify
+
+load_dotenv()
+
+
+SHOPIFY_API_KEY = os.getenv("SHOPIFY_API_KEY")
+SHOPIFY_API_SECRET = os.getenv("SHOPIFY_API_SECRET")
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,11 +35,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-hd==_b*nj$ni8p#i40eu2t#@n2+lqb-7hm0b-gkkz^a)91(ccm'
 
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.0.106"]
 
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True 
+
+AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend'
+]
+
+SITE_ID = 2
+
+SOCIALACCOUNT_LOGIN_ON_GET=True
 
 # Application definition
 
@@ -36,14 +62,27 @@ INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'userauths',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    
     'store',
+    'payment',
+    'customer',
+    'my_shopify_app',
+    
+    # Third party
+    'ckeditor',
+    'paypal.standard.ipn',
+    'mathfilters',
+    
+    # all auth configurations
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google'
 ]
 
 MIDDLEWARE = [
@@ -54,7 +93,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    'allauth.account.middleware.AccountMiddleware',
 ]
+
 
 ROOT_URLCONF = 'mystore.urls'
 
@@ -65,6 +107,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'store.context_processor.default',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -139,12 +182,25 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 JAZZMIN_SETTINGS = {
     "site_header": "Madarima",
     "site_brand": "Madarima",
-    "site_logo": "img/admin-logo.jpg",
+    "site_logo": "img/madarima..png",
     "copyright" : "madarima.com ",
 }
 
-AUTH_USER_MODEL = 'userauths.User'
+AUTH_USER_MODEL = 'my_shopify_app.AuthAppShopUser'
+
+LOGIN_URL = 'userauths:sign-in'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+CKEDITOR_UPLOAD_PATH = 'uploads/'
+
+PAYPAL_TEST = True
+
+PAYPAL_RECEIVER_EMAIL = "yokzzbusiness@paypal.com"
+
+PAYPAL_CLIENT_ID = 'AXG2FqENmi4prLZbBTPuPy8kpKVdS8ex7jO7XYhdfUpOP-M25dSGmgP01KVttVLGM8vWIZOqv_ZcVuO5'
+PAYPAL_SECRET = 'EOpre8_qV3975vXLyJLpZz2F2riSwpQcFxsb8BtONe43YLM3MpoRxWZM7n6HSb7qvivUln6Hyir9ch07'

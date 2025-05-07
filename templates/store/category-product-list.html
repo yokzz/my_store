@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- Category Title -->
+<div class="heading-section">
+    <h1 class="category-title">{{ category.title }}</h1>
+    <p class="product-count">We found <span class="featured-text">{{ products.count }}</span> item{{ products.count|pluralize }} for you!</p>
+</div>
+
+<div class="product-container">
+    {% for product in products %}
+    <!-- Product Item -->
+    <div class="product-item">
+        <div class="discount-badge">-{{ product.get_percentage|floatformat:0 }}%</div>
+        <!-- Product Image -->
+        <div class="images">
+            <img src="{{ product.image.url }}" alt="{{ product.title }}"/>
+        </div>
+        <!-- Product Properties -->
+        <div class="product">
+            <!-- Product Category -->
+            <div style="display: flex; flex-direction: column;">
+                <p>{{ product.category.title }} </p>
+                <h1><a href="{% url 'store:product-detail' product.pid %}">{{ product.title|truncatechars:30 }}</a></h1>
+            </div>
+            <div class="cnt-price">
+                <h2>$</h2><h2 style="margin-right: 7px;"class="current-price-{{ product.id }}">{{ product.price }}</h2>
+                <h2 class="old-price">${{ product.old_price }}</h2>
+            </div>
+            <p class="description">{{ product.description|safe|truncatechars:75 }}</p>
+
+            <div class="buttons">
+                <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ product.id }}"/>
+                <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
+                <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
+                <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
+                <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
+                {% if product.id in wishlist_obj %}
+                    <button type="submit" class="add-to-wishlist btn like" in-wishlist="true" data-product-item="{{ product.id }}"><i class="fa-solid fa-heart wishlist-svg"></i></button>
+                {% else %}
+                    <button type="submit" class="add-to-wishlist btn like" in-wishlist="false" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart wishlist-svg "></i></button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock content %}

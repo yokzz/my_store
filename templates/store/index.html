@@ -2,40 +2,95 @@
 {% load static %}
 
 {% block content %}
+    <div class="banner">
+        <div class="overlay">
+        <h1>WHERE DREAMS COME TRUE</h1>
+        <p>Shop Here.</p>
+        <a href="{% url 'store:product-list' %}">SHOP NOW</a>
+        </div>
+    </div>
+    <h1 class="home-text">FEATURED PRODUCTS</h1>
+    <div class="product-container">
+        {% for product in products %}
+        <div class="product-item">
+            <div class="discount-badge">-{{ product.get_percentage|floatformat:0 }}%</div>
+            <!-- Product Image -->
+            <div class="images">
+                <img src="{{ product.image.url }}" alt="{{ product.title }}"/>
+            </div>
+            <!-- Product Properties -->
+            <div class="product">
+                <!-- Product Category -->
+                <div style="display: flex; flex-direction: column;">
+                    <p>{{ product.category.title }} </p>
+                    <h1><a href="{% url 'store:product-detail' product.pid %}">{{ product.title|truncatechars:30 }}</a></h1>
+                </div>
+                <div class="cnt-price">
+                    <h2>$</h2><h2 style="margin-right: 7px;"class="current-price-{{ product.id }}">{{ product.price }}</h2>
+                    <h2 class="old-price">${{ product.old_price }}</h2>
+                </div>
+                <p class="description">{{ product.description|safe|truncatechars:75 }}</p>
 
-<h1>Welcome to my store</h1>
-
-{% for product in products %}
-<!-- Product Discount -->
-<div>
-    <span>-{{ product.get_percentage|floatformat:0 }}%</span>
-</div>
-<!-- Product Image -->
-<div>
-    <img src="{{ product.image.url }}" alt="" height="128" width="128" />
-</div>
-<!-- Product Category -->
-<div>
-    <a href="#">{{ product.category.title }}</a>
-</div>
-<!-- Product Title -->
-<div>
-    <p>{{ product.title }}</p>
-</div>
-<!-- Product Vendor -->
-<div>
-    <li>By {{ product.vendor.title }}</li>
-</div>
-<!-- Product Price -->
-<div>   
-    <span>${{ product.price }}</span>
-    <br>
-    <span>${{ product.old_price }}</span>
-</div>
-<br>
-<!-- Product End-->
-
-{% endfor %}
-
-
+                <div class="buttons">
+                    <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.pid }}" class="product-pid-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.id }}" class="product-id-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.image.url }}" class="product-image-{{ product.id }}"/>
+                    <input type="hidden" value="{{ product.title }}" class="product-title-{{ product.id }}"/> 
+                    <button type="submit" class="add-to-cart-btn btn add" data-index="{{ product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Add</button>
+                    {% if product.id in wishlist_obj %}
+                        <button type="submit" class="add-to-wishlist btn like" in-wishlist="true" data-product-item="{{ product.id }}"><i class="fa-solid fa-heart wishlist-svg"></i></button>
+                    {% else %}
+                        <button type="submit" class="add-to-wishlist btn like" in-wishlist="false" data-product-item="{{ product.id }}"><i class="fa-regular fa-heart wishlist-svg "></i></button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if cart_data %}
+        <div class="cart-sidebar hidden" id="cart-sidebar">
+            <div class="cart-sidebar-header">
+                <h3>Cart</h3>
+                <button id="closeCart" class="close-button"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="cart-sidebar-items">
+                {% for product_id, product in cart_data.items %}
+                <div class="cart-sidebar-item">
+                    <img src="{{ product.image }}" alt="product.title" />
+                    <div class="cart-sidebar-item-details">
+                        <div class="line">
+                            <h3>{{ product.title }}</h3>
+                            <p class="price"><span>$</span><span>{{ product.price }}</span></p>
+                        </div>
+                        <div class="btns">
+                            <div class="quantity-controls">
+                                <button class="decrease" data-product="{{ product_id }}">-</button>
+                                <span class="quantity" id="product-quantity-{{ product_id }}">{{ product.quantity }}</span>
+                                <button class="increase" data-product="{{ product_id }}">+</button>
+                            </div>
+                            <button class="delete-side-product" data-product="{{ product_id }}"><i class="fa-solid fa-trash-can"></i></button>
+                            <button class="update-side-product" data-product="{{ product_id }}"><i class="fa-solid fa-arrows-rotate"></i></button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="cart-sidebar-footer">
+                <a class="btn-beige" href="{% url 'store:cart' %}">Go to cart</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="cart-sidebar hidden" id="cart-sidebar">
+            <div class="cart-sidebar-header">
+                <h3>Cart</h3>
+                <button id="closeCart" class="close-button"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="cart-sidebar-items">
+            </div>
+            <div class="cart-sidebar-footer">
+                <a class="btn-beige" href="{% url 'store:cart' %}">Go to cart</a>
+            </div>
+        </div>
+    {% endif %}
 {% endblock content %}

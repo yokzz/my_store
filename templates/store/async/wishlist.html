@@ -1,0 +1,35 @@
+<h3>There are <span class="featured-text">{{ wishlist_obj|length }}</span> product{{ wishlist_obj|length|pluralize }} in your wishlist</h3>
+<div class="wishlist-items">
+    <div class="labels">
+        <table>
+            <td class="product-td">Product</td>
+            <td class="price-td">Price</td>
+            <td class="stock-td">Stock</td>
+            <td class="add-td">Add</td>
+            <td class="remove-td">Remove</td>
+        </table>
+    </div>
+    {% for wishlist in wishlist_obj %}
+    <div class="wishlist-item">
+        <img src="{{ wishlist.product.image.url }}" alt="{{ wishlist.product.title }}" />
+        <a href="{% url 'store:product-detail' wishlist.product.pid %}" class="title">{{ wishlist.product.title|truncatechars:50 }}</a>
+        <p class="price"><span>$</span><span class="current-price-{{ wishlist.product.id }}">{{ wishlist.product.price|floatformat:2 }}</span></p>
+        {% comment %} <span class="featured-text">$</span><p class="price current-price-{{ wishlist.product.id }}">{{ wishlist.product.price|floatformat:2 }}</p> {% endcomment %}
+        {% if wishlist.product.in_stock %}
+            <p class="stock in-stock">In Stock</p>
+        {% else %}
+            <p class="stock out-stock">Out of Stock</p>
+        {% endif %}
+        <div class="flex">
+            <input type="hidden" value="1" id="product-quantity" class="product-quantity-{{ wishlist.product.id }}"/>
+            <input type="hidden" value="{{ wishlist.product.pid }}" class="product-pid-{{ wishlist.product.id }}"/>
+            <input type="hidden" value="{{ wishlist.product.id }}" class="product-id-{{ wishlist.product.id }}"/>
+            <input type="hidden" value="{{ wishlist.product.image.url }}" class="product-image-{{ wishlist.product.id }}"/>
+            <input type="hidden" value="{{ wishlist.product.title }}" class="product-title-{{ wishlist.product.id }}"/> 
+            <i class="fa-solid fa-plus plus"></i>
+            <button type="submit" class="add-to-cart-btn cart" data-index="{{ wishlist.product.id }}" id="add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+            <button class="remove-from-wishlist trash" data-wishlist-product="{{ wishlist.id }}"><i class="fa-solid fa-trash"></i></button>
+        </div>
+    </div>
+    {% endfor %}
+</div>

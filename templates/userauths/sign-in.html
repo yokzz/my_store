@@ -1,18 +1,49 @@
 {% extends "base.html" %}
+{% load static %}
+{% load socialaccount %}
 
 {% block content %}
 
-<p> Dont have an account?
-    <a href="{% url 'userauths:sign-up' %}">Create here</a>
-</p>
+<div class="sign-container">
+    <section class="container forms">
+        <div class="form login">
+          <div class="form-content">
+            <header>Login</header>
+            <form method="post">
+              {% csrf_token %}
 
-<form method="post">
-    {% csrf_token %}
-
-    <input type="text" required name="email" placeholder="Username or Email">
-    <input type="password" required name="password" placeholder="Your password">
-
-    <button type="submit">Login</button>
-</form>
-
+              <div class="field input-field">
+                <input type="email" id="email" name="email" placeholder="Email" class="input">
+              </div>
+              <div class="field input-field">
+                <input type="password" id="password" name="password" placeholder="Password" class="password">
+                <i class='bx bx-hide eye-icon'></i>
+              </div>
+              <div class="form-link">
+                <a href="#" class="forgot-pass">Forgot password?</a>
+              </div>
+              <div class="field button-field">
+                <button>Login</button>
+              </div>
+            </form>
+            <div class="form-link">
+              <span>Don't have an account? <a href="{% url 'userauths:sign-up' %}" class="signup-link">Signup</a></span>
+            </div>
+          </div>
+          <div class="line"></div>
+          {% comment %} <div class="media-options">
+            <a href="#" class="field facebook">
+              <i class='bx bxl-facebook facebook-icon'></i>
+              <span>Login with Facebook</span>
+            </a>
+          </div> {% endcomment %}
+          <div class="media-options">
+            <a href="{% provider_login_url 'google' %}" class="field google">
+              <img src="{% static 'img/google.png' %}" alt="" class="google-img">
+              <span>Login with Google</span>
+            </a>
+          </div>
+        </div>
+    </section>
+</div>
 {% endblock content %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div id="message-response" class="message-response">
+    <div class="card">
+
+        <span class="success"><i class="fa-solid fa-check"></i></span>
+        
+        <h1 class="card-msg">Success</h1>
+        
+        <h4>Message sent successfully</h4>
+        
+    </div>
+</div>
+
+<div class="contact-container">
+    <div class="body">
+        <div id="message-response" class="message-response">
+            <div class="card">
+      
+                <span class="success"><i class="fa-solid fa-check"></i></span>
+                
+                <h1 class="card-msg">Success</h1>
+                
+                <h4>Message sent successfully</h4>
+                
+            </div>
+        </div>
+        <div class="image" id="contact-img">
+            <img src="{% static 'img/contactus.png' %}"/>
+        </div>
+        <form id="contact-form" class="contact-form" method="POST">
+            {% csrf_token %}
+            <span class="title">Message Us</span>
+
+            <div class="form-fields">
+                <div class="two-inputs">
+                    <div class="wrap-input">
+                        <input class="input" type="text" id="first_name" name="first_name" required placeholder="First Name" class="form-input">
+                        <span class="focus-input"></span>
+                        <span class="symbol"><i class="fa-solid fa-user"></i></span>
+                    </div>
+                    <div class="wrap-input">
+                        <input class="input" type="text" id="last_name" name="last_name" required placeholder="Last Name" class="form-input">
+                        <span class="focus-input"></span>
+                        <span class="symbol"><i class="fa-regular fa-user"></i></span>
+                    </div>
+                </div>
+                <div class="two-inputs">
+                    <div class="wrap-input">
+                        <input class="input" type="email" id="email" name="email" required placeholder="Email" class="form-input">
+                        <span class="focus-input"></span>
+                        <span class="symbol"><i class="fa fa-envelope"></i></span>
+                    </div>
+                    <div class="wrap-input">
+                        <input class="input" type="tel" id="phone" name="phone" required placeholder="Phone" class="form-input">
+                        <span class="focus-input"></span>
+                        <span class="symbol"><i class="fa fa-phone"></i></span>
+                    </div>
+                </div>
+                <div class="wrap-input">
+                    <input class="input" type="text" id="subject" name="subject" required placeholder="Subject" class="form-input">
+                    <span class="focus-input"></span>
+                    <span class="symbol"><i class="fa fa-file-alt"></i></span>
+                </div>
+                <div class="wrap-input">
+                    <textarea class="input" id="message" name="message" required placeholder="Complain about your problem" class="form-input"></textarea>
+                    <span class="focus-input"></span>
+                </div>
+                <div class="container-form-btn">
+                    <button type="submit" class="form-btn">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}
